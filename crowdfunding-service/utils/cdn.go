@@ -15,7 +15,7 @@ func CdnUrlFor(fileUrl string) string {
 	} else {
 		result += "http://"
 	}
-	result += configuration.CdnDomain + "/static/" + fileUrl
+	result += configuration.CdnDomain + "/" + fileUrl
 	return result
 }
 
@@ -30,6 +30,6 @@ func CdnUrlFor2(filePath string, fileUrl string) string {
 	} else {
 		result += "http://"
 	}
-	result += configuration.CdnDomain + "/static/" + filePath + fileUrl
+	result += configuration.CdnDomain + "/" + filePath + fileUrl
 	return result
 }

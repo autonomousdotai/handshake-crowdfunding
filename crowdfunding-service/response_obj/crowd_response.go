@@ -13,6 +13,7 @@ type CrowdFundingResponse struct {
 	Description      string                      `json:"description"`
 	ShortDescription string                      `json:"short_description"`
 	Image            string                      `json:"image"`
+	YoutubeUrl       string                      `json:"youtube_url"`
 	CrowdDate        time.Time                   `json:"crowd_date"`
 	DeliverDate      time.Time                   `json:"deliver_date"`
 	Price            float64                     `json:"price"`
@@ -44,7 +45,8 @@ func MakeCrowdFundingResponse(model models.CrowdFunding) CrowdFundingResponse {
 	result.Name = model.Name
 	result.Description = model.Description
 	result.ShortDescription = model.ShortDescription
-	result.Image = utils.CdnUrlFor2("upload/images/crowd-funding/", model.Image)
+	result.YoutubeUrl = model.YoutubeUrl
+	result.Image = utils.CdnUrlFor(model.Image)
 	result.CrowdDate = model.CrowdDate
 	result.DeliverDate = model.DeliverDate
 	result.Price = model.Price
@@ -57,7 +59,7 @@ func MakeCrowdFundingResponse(model models.CrowdFunding) CrowdFundingResponse {
 func MakeCrowdFundingImageResponse(model models.CrowdFundingImage) CrowdFundingImageResponse {
 	result := CrowdFundingImageResponse{}
 	result.ID = model.ID
-	result.Image = model.Image
+	result.Image = utils.CdnUrlFor(model.Image)
 	return result
 }
 
