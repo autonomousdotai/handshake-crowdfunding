@@ -16,6 +16,7 @@ type CrowdFunding struct {
 	Description        string
 	ShortDescription   string
 	Image              string
+	YoutubeUrl         string
 	CrowdDate          time.Time
 	DeliverDate        time.Time
 	Price              float64

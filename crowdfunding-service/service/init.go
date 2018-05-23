@@ -5,9 +5,10 @@ import (
 	"../utils/service"
 )
 
-var s3Service = service.S3Service{}
+var fileUploadService = service.GSService{}
 // service
 var crowdFundingDao = dao.CrowdFundingDao{}
 var crowdFundingImageDao = dao.CrowdFundingImageDao{}
 var crowdFundingShakedDao = dao.CrowdFundingShakedDao{}
+var ethTxDao = dao.EthTxDao{}
 // template

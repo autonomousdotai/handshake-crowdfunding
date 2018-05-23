@@ -7,18 +7,13 @@ import (
 )
 
 type Configuration struct {
-	ServicePort int
-
-	DB string
-
-	CdnDomain string
-	CdnHttps  bool
-
-	S3BucketName      string
-	AwsKeyId          string
-	AwsSecretKey      string
-	UploadImageFolder string
-
+	ServicePort       int
+	DB                string
+	CdnDomain         string
+	CdnHttps          bool
+	GSCredentialsFile string
+	GSBucketName      string
+	UploadFolder      string
 	OriginDomainLocal string
 	OriginDomainRun   []string
 }

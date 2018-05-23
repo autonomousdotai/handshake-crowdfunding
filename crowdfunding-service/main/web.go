@@ -76,7 +76,7 @@ func CORSMiddleware() gin.HandlerFunc {
 
 func AuthorizeMiddleware() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		userId, _ := strconv.Atoi(context.GetHeader("USER-ID"))
+		userId, _ := strconv.ParseInt(context.GetHeader("User-Id"), 10, 64)
 		context.Set("UserId", userId)
 		context.Next()
 	}

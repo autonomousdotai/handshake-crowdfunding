@@ -6,4 +6,3 @@ go get -u github.com/jinzhu/gorm
 go get github.com/go-sql-driver/mysql
 go get -u github.com/aws/aws-sdk-go
 go get github.com/gin-contrib/cors
-go get github.com/nicksnyder/go-i18n/goi18n

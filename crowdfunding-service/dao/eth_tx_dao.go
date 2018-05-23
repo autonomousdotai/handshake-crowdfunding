@@ -7,11 +7,11 @@ import (
 	"time"
 )
 
-type CrowdFundingDao struct {
+type EthTxDao struct {
 }
 
-func (crowdFundingDao CrowdFundingDao) GetById(id int64) (models.CrowdFunding) {
-	dto := models.CrowdFunding{}
+func (ethTxDao EthTxDao) GetById(id int64) (models.EthTx) {
+	dto := models.EthTx{}
 	err := models.Database().Where("id = ?", id).First(&dto).Error
 	if err != nil {
 		log.Print(err)
@@ -19,7 +19,7 @@ func (crowdFundingDao CrowdFundingDao) GetById(id int64) (models.CrowdFunding) {
 	return dto
 }
 
-func (crowdFundingDao CrowdFundingDao) Create(dto models.CrowdFunding, tx *gorm.DB) (models.CrowdFunding, error) {
+func (ethTxDao EthTxDao) Create(dto models.EthTx, tx *gorm.DB) (models.EthTx, error) {
 	if tx == nil {
 		tx = models.Database()
 	}
@@ -33,7 +33,7 @@ func (crowdFundingDao CrowdFundingDao) Create(dto models.CrowdFunding, tx *gorm.
 	return dto, nil
 }
 
-func (crowdFundingDao CrowdFundingDao) Update(dto models.CrowdFunding, tx *gorm.DB) (models.CrowdFunding, error) {
+func (ethTxDao EthTxDao) Update(dto models.EthTx, tx *gorm.DB) (models.EthTx, error) {
 	if tx == nil {
 		tx = models.Database()
 	}
@@ -46,7 +46,7 @@ func (crowdFundingDao CrowdFundingDao) Update(dto models.CrowdFunding, tx *gorm.
 	return dto, nil
 }
 
-func (crowdFundingDao CrowdFundingDao) Delete(dto models.CrowdFunding, tx *gorm.DB) (models.CrowdFunding, error) {
+func (ethTxDao EthTxDao) Delete(dto models.EthTx, tx *gorm.DB) (models.EthTx, error) {
 	if tx == nil {
 		tx = models.Database()
 	}
