@@ -41,7 +41,6 @@ func LoadConfig() (*Configuration, error) {
 		log.Println("error:", errJson)
 		return nil, err
 	}
-	log.Println(configuration)
 	// End load config
 	return &configuration, nil
 }

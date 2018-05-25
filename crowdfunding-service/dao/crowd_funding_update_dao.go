@@ -5,14 +5,13 @@ import (
 	"log"
 	"github.com/jinzhu/gorm"
 	"time"
-	"strings"
 )
 
-type EthTxDao struct {
+type CrowdFundingUpdateDao struct {
 }
 
-func (ethTxDao EthTxDao) GetById(id int64) (models.EthTx) {
-	dto := models.EthTx{}
+func (crowdFundingUpdateDao CrowdFundingUpdateDao) GetById(id int) (models.CrowdFundingUpdate) {
+	dto := models.CrowdFundingUpdate{}
 	err := models.Database().Where("id = ?", id).First(&dto).Error
 	if err != nil {
 		log.Print(err)
@@ -20,13 +19,10 @@ func (ethTxDao EthTxDao) GetById(id int64) (models.EthTx) {
 	return dto
 }
 
-func (ethTxDao EthTxDao) Create(dto models.EthTx, tx *gorm.DB) (models.EthTx, error) {
+func (crowdFundingUpdateDao CrowdFundingUpdateDao) Create(dto models.CrowdFundingUpdate, tx *gorm.DB) (models.CrowdFundingUpdate, error) {
 	if tx == nil {
 		tx = models.Database()
 	}
-	dto.Hash = strings.ToLower(dto.Hash)
-	dto.FromAddress = strings.ToLower(dto.FromAddress)
-	dto.ToAddress = strings.ToLower(dto.ToAddress)
 	dto.DateCreated = time.Now()
 	dto.DateModified = dto.DateCreated
 	err := tx.Create(&dto).Error
@@ -37,13 +33,10 @@ func (ethTxDao EthTxDao) Create(dto models.EthTx, tx *gorm.DB) (models.EthTx, er
 	return dto, nil
 }
 
-func (ethTxDao EthTxDao) Update(dto models.EthTx, tx *gorm.DB) (models.EthTx, error) {
+func (crowdFundingUpdateDao CrowdFundingUpdateDao) Update(dto models.CrowdFundingUpdate, tx *gorm.DB) (models.CrowdFundingUpdate, error) {
 	if tx == nil {
 		tx = models.Database()
 	}
-	dto.Hash = strings.ToLower(dto.Hash)
-	dto.FromAddress = strings.ToLower(dto.FromAddress)
-	dto.ToAddress = strings.ToLower(dto.ToAddress)
 	dto.DateModified = time.Now()
 	err := tx.Save(&dto).Error
 	if err != nil {
@@ -53,7 +46,7 @@ func (ethTxDao EthTxDao) Update(dto models.EthTx, tx *gorm.DB) (models.EthTx, er
 	return dto, nil
 }
 
-func (ethTxDao EthTxDao) Delete(dto models.EthTx, tx *gorm.DB) (models.EthTx, error) {
+func (crowdFundingUpdateDao CrowdFundingUpdateDao) Delete(dto models.CrowdFundingUpdate, tx *gorm.DB) (models.CrowdFundingUpdate, error) {
 	if tx == nil {
 		tx = models.Database()
 	}

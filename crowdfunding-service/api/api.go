@@ -2,11 +2,11 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"../response_obj"
-	"../request_obj"
+	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/response_obj"
+	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/request_obj"
 	"net/http"
 	"strconv"
-	"../bean"
+	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/bean"
 	"log"
 	"encoding/json"
 )
@@ -14,26 +14,20 @@ import (
 type Api struct {
 }
 
-func (api Api) Init(router *gin.Engine) *gin.RouterGroup {
-	apiGroupApi := router.Group("/api")
-	{
-		apiGroupApi.GET("/", func(context *gin.Context) {
-			context.String(200, "Crowdsale API")
-		})
-		apiGroupApi.POST("/crowd-funding", func(context *gin.Context) {
-			api.CreateCrowdFunding(context)
-		})
-		apiGroupApi.PUT("/crowd-funding", func(context *gin.Context) {
-			api.UpdateCrowdFunding(context)
-		})
-		apiGroupApi.GET("/crowd-funding/:crowd_funding_id", func(context *gin.Context) {
-			api.GetCrowdFunding(context)
-		})
-		apiGroupApi.POST("/crowd-funding/shaked/:crowd_funding_id", func(context *gin.Context) {
-			api.ShakedCrowdFunding(context)
-		})
-	}
-	return apiGroupApi
+func (api Api) Init(router *gin.Engine) *gin.Engine {
+	router.POST("/crowd-funding", func(context *gin.Context) {
+		api.CreateCrowdFunding(context)
+	})
+	router.PUT("/crowd-funding", func(context *gin.Context) {
+		api.UpdateCrowdFunding(context)
+	})
+	router.GET("/crowd-funding/:crowd_funding_id", func(context *gin.Context) {
+		api.GetCrowdFunding(context)
+	})
+	router.POST("/crowd-funding/shaked/:crowd_funding_id", func(context *gin.Context) {
+		api.ShakedCrowdFunding(context)
+	})
+	return router
 }
 
 func (self Api) CreateCrowdFunding(context *gin.Context) {
@@ -61,8 +55,7 @@ func (self Api) CreateCrowdFunding(context *gin.Context) {
 		context.JSON(http.StatusOK, result)
 		return
 	}
-	imageFile, imageFileHeader, err := context.Request.FormFile("image")
-	crowdFunging, appErr := crowdService.CreateCrowdFunding(userId.(int64), *request, &imageFile, imageFileHeader)
+	crowdFunging, appErr := crowdService.CreateCrowdFunding(userId.(int64), *request, context)
 	if appErr != nil {
 		log.Print(appErr.OrgError)
 		result.SetStatus(bean.UnexpectedError)

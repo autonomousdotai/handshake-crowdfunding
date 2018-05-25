@@ -11,7 +11,7 @@ import (
 	"golang.org/x/net/context"
 	"log"
 	"io"
-	"../../setting"
+	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/setting"
 	"google.golang.org/api/option"
 )
 

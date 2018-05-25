@@ -2,8 +2,8 @@ package response_obj
 
 import (
 	"time"
-	"../models"
-	"../utils"
+	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/models"
+	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/utils"
 )
 
 type CrowdFundingResponse struct {
@@ -12,8 +12,6 @@ type CrowdFundingResponse struct {
 	Name             string                      `json:"name"`
 	Description      string                      `json:"description"`
 	ShortDescription string                      `json:"short_description"`
-	Image            string                      `json:"image"`
-	YoutubeUrl       string                      `json:"youtube_url"`
 	CrowdDate        time.Time                   `json:"crowd_date"`
 	DeliverDate      time.Time                   `json:"deliver_date"`
 	Price            float64                     `json:"price"`
@@ -24,9 +22,7 @@ type CrowdFundingResponse struct {
 
 type CrowdFundingImageResponse struct {
 	ID             int64                `json:"id"`
-	CrowdFundingId int64                `json:"crowd_funding_id"`
-	CrowdFunding   CrowdFundingResponse `json:"crowd_funding"`
-	Image          string               `json:"name"`
+	Image          string               `json:"image"`
 }
 
 type CrowdFundingShakedResponse struct {
@@ -45,8 +41,6 @@ func MakeCrowdFundingResponse(model models.CrowdFunding) CrowdFundingResponse {
 	result.Name = model.Name
 	result.Description = model.Description
 	result.ShortDescription = model.ShortDescription
-	result.YoutubeUrl = model.YoutubeUrl
-	result.Image = utils.CdnUrlFor(model.Image)
 	result.CrowdDate = model.CrowdDate
 	result.DeliverDate = model.DeliverDate
 	result.Price = model.Price

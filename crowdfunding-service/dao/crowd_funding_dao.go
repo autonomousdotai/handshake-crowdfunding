@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"../models"
+	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/models"
 	"log"
 	"github.com/jinzhu/gorm"
 	"time"
@@ -13,6 +13,33 @@ type CrowdFundingDao struct {
 func (crowdFundingDao CrowdFundingDao) GetById(id int64) (models.CrowdFunding) {
 	dto := models.CrowdFunding{}
 	err := models.Database().Where("id = ?", id).First(&dto).Error
+	if err != nil {
+		log.Print(err)
+	}
+	return dto
+}
+
+func (crowdFundingDao CrowdFundingDao) GetFullById(id int64) (models.CrowdFunding) {
+	dto := models.CrowdFunding{}
+	db := models.Database()
+	db = db.Preload("CrowdFundingImages")
+	db = db.Where("id = ?", id)
+	err := db.First(&dto).Error
+	if err != nil {
+		log.Print(err)
+	}
+	return dto
+}
+
+func (crowdFundingDao CrowdFundingDao) GetFullByUser(userId int64, id int64) (models.CrowdFunding) {
+	dto := models.CrowdFunding{}
+	db := models.Database()
+	db = db.Preload("CrowdFundingImages")
+	if userId > 0 {
+		db = db.Preload("CrowdFundingShaked", "status > 0 AND user_id = ?", userId)
+	}
+	db = db.Where("id = ?", id)
+	err := db.First(&dto).Error
 	if err != nil {
 		log.Print(err)
 	}

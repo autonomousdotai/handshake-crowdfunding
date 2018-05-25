@@ -13,7 +13,6 @@ type CrowdFundingShaked struct {
 	ID             int64
 	UserId         int64
 	CrowdFundingId int64
-	CrowdFunding   CrowdFunding
 	Price          float64
 	Quantity       int
 	Amount         float64

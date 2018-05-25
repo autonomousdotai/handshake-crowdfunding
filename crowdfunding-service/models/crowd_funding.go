@@ -15,8 +15,6 @@ type CrowdFunding struct {
 	Name               string
 	Description        string
 	ShortDescription   string
-	Image              string
-	YoutubeUrl         string
 	CrowdDate          time.Time
 	DeliverDate        time.Time
 	Price              float64
@@ -25,6 +23,7 @@ type CrowdFunding struct {
 	ShakedNum          int
 	Status             int
 	CrowdFundingImages []CrowdFundingImage
+	CrowdFundingShaked CrowdFundingShaked
 }
 
 func (CrowdFunding) TableName() string {

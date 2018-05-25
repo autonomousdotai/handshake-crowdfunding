@@ -1,6 +1,8 @@
 package request_obj
 
-import "time"
+import (
+	"time"
+)
 
 type CrowdFundingRequest struct {
 	Name             string    `json:"name"`
@@ -12,4 +14,15 @@ type CrowdFundingRequest struct {
 	Price            float64   `json:"price"`
 	Goal             float64   `json:"goal"`
 	Status           int       `json:"status"`
+}
+
+type CrowdFundingFaqRequest struct {
+	Question string `json:"question"`
+	Answer   string `json:"answer"`
+}
+
+type CrowdFundingUpdateRequest struct {
+	Title            string `json:"title"`
+	ShortDescription string `json:"short_description"`
+	Description      string `json:"description"`
 }

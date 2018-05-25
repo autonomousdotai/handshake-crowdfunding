@@ -8,8 +8,8 @@ import (
 	"os"
 	"strconv"
 	"time"
-	"../api"
-	"../setting"
+	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/api"
+	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/setting"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/contrib/gzip"
 	"github.com/gin-gonic/gin"
@@ -40,7 +40,7 @@ func main() {
 	index := router.Group("/")
 	{
 		index.GET("/", func(context *gin.Context) {
-			context.String(http.StatusOK, "API")
+			context.String(http.StatusOK, "Crowdfunding Service API")
 		})
 	}
 	api := api.Api{}

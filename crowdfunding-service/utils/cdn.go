@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"../setting"
+	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/setting"
 )
 
 func CdnUrlFor(fileUrl string) string {
