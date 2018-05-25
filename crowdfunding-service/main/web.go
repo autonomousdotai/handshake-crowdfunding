@@ -13,8 +13,6 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/contrib/gzip"
 	"github.com/gin-gonic/gin"
-	"github.com/getsentry/raven-go"
-	"github.com/gin-gonic/contrib/sentry"
 )
 
 func main() {
@@ -32,7 +30,6 @@ func main() {
 	// Setting router
 	router := gin.Default()
 	router.Use(Logger())
-	router.Use(sentry.Recovery(raven.DefaultClient, false))
 	router.Use(CORSMiddleware())
 	router.Use(AuthorizeMiddleware())
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
