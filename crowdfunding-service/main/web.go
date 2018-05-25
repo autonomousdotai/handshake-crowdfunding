@@ -37,7 +37,11 @@ func main() {
 	index := router.Group("/")
 	{
 		index.GET("/", func(context *gin.Context) {
-			context.String(http.StatusOK, "Crowdfunding Service API")
+			result := map[string]interface{}{
+				"status":  1,
+				"message": "Crowdfunding Service API",
+			}
+			context.JSON(http.StatusOK, result)
 		})
 	}
 	api := api.Api{}
@@ -60,7 +64,7 @@ func CORSMiddleware() gin.HandlerFunc {
 	// Gin Cors setting
 	return cors.New(cors.Config{
 		AllowOrigins:     []string{setting.CurrentConfig().OriginDomainLocal},
-		AllowMethods:     []string{"POST", "GET", "OPTIONS", "PUT", "DELETE", "UPDATE"},
+		AllowMethods:     []string{"POST", "GET", "OPTIONS", "PUT", "DELETE", "PATCH"},
 		AllowHeaders:     []string{"Content-Type", "Origin", "Device-Type", "Device-Id", "*"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
