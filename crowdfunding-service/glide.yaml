@@ -1,8 +1,0 @@
-package: .
-import:
-- package: github.com/gin-gonic/gin
-- package: github.com/jinzhu/gorm
-- package: github.com/go-sql-driver/mysql
-- package: github.com/gin-contrib/cors
-- package: github.com/gin-gonic/contrib/sessions
-- package: cloud.google.com/go/storage
