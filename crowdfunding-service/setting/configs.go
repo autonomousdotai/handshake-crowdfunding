@@ -16,6 +16,7 @@ type Configuration struct {
 	UploadFolder      string
 	OriginDomainLocal string
 	OriginDomainRun   []string
+	SolrServiceUrl    string
 }
 
 func (configuration Configuration) String() string {

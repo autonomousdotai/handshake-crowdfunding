@@ -15,6 +15,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"strconv"
 	"fmt"
+	"bytes"
+	"encoding/json"
+	"net/http"
+	"github.com/algolia/algoliasearch-client-go/algoliasearch"
 )
 
 type CrowdService struct {
@@ -70,10 +74,10 @@ func (crowdService CrowdService) CreateCrowdFunding(userId int64, request reques
 		}
 		filePath := ""
 		if imageFile != nil && imageFileHeader != nil {
-			uploadImageFolder := setting.CurrentConfig().UploadFolder + "/crowd-funding/image"
+			uploadImageFolder := "/crowdfunding"
 			fileName := imageFileHeader.Filename
 			imageExt := strings.Split(fileName, ".")[1]
-			fileNameImage := fmt.Sprintf("crowd-funding-%d-image-%s.%s", crowdFunding.ID, time.Now().Format("20060102150405"), imageExt)
+			fileNameImage := fmt.Sprintf("crowdfunding-%d-image-%s.%s", crowdFunding.ID, time.Now().Format("20060102150405"), imageExt)
 			err := fileUploadService.UploadFormFile(imageFile, uploadImageFolder, fileNameImage, imageFileHeader)
 			if err != nil {
 				log.Println(err)
@@ -269,5 +273,48 @@ func (crowdService CrowdService) RefundCrowdFunding(userId int64, crowdFundingId
 	}
 
 	tx.Commit()
+	return nil
+}
+
+func (crowdService CrowdService) MakeObjectToIndex(crowdFundingId int64) (error) {
+	crowdFunding := crowdFundingDao.GetFullById(crowdFundingId)
+
+	document := map[string]interface{}{
+		"add": [] interface{}{
+			map[string]interface{}{
+				"id":                fmt.Sprintf("crowd_%d", crowdFunding.ID),
+				"type":              "handshake",
+				"name":              crowdFunding.Name,
+				"short_description": crowdFunding.ShortDescription,
+				"description":       crowdFunding.Description,
+				"goal":              crowdFunding.Goal,
+				"balance":           crowdFunding.Balance,
+				"shaked_num":        crowdFunding.ShakedNum,
+				"crowd_date":        crowdFunding.CrowdDate,
+				"deliver_date":      crowdFunding.DeliverDate,
+				"status":            crowdFunding.Status,
+			},
+		},
+	}
+
+	jsonStr, err := json.Marshal(document)
+	if err != nil {
+		return err
+	}
+	req, err := http.NewRequest("POST", setting.CurrentConfig().SolrServiceUrl+"/handshake/update", bytes.NewBuffer(jsonStr))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	bodyBytes, err := netUtil.CurlRequest(req)
+	if err != nil {
+		return err
+	}
+	result := algoliasearch.BatchRes{}
+	err = json.Unmarshal(bodyBytes, &result)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 	return nil
 }

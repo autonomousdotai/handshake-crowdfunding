@@ -15,16 +15,16 @@ type Api struct {
 }
 
 func (api Api) Init(router *gin.Engine) *gin.Engine {
-	router.POST("/crowd-funding", func(context *gin.Context) {
+	router.POST("/", func(context *gin.Context) {
 		api.CreateCrowdFunding(context)
 	})
-	router.PUT("/crowd-funding", func(context *gin.Context) {
+	router.PUT("/", func(context *gin.Context) {
 		api.UpdateCrowdFunding(context)
 	})
-	router.GET("/crowd-funding/:crowd_funding_id", func(context *gin.Context) {
+	router.GET("/:crowd_funding_id", func(context *gin.Context) {
 		api.GetCrowdFunding(context)
 	})
-	router.POST("/crowd-funding/shaked/:crowd_funding_id", func(context *gin.Context) {
+	router.POST("/shaked/:crowd_funding_id", func(context *gin.Context) {
 		api.ShakedCrowdFunding(context)
 	})
 	return router

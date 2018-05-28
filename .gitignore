@@ -1,5 +1,7 @@
 *.DS_Store
 */.idea
 */node_modules
+*/*.lock
+crowdfunding-service/vendor
 crowdfunding-service/logs
 crowdfunding-service/setting/*.json
