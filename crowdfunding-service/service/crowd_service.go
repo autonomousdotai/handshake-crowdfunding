@@ -74,7 +74,7 @@ func (crowdService CrowdService) CreateCrowdFunding(userId int64, request reques
 		}
 		filePath := ""
 		if imageFile != nil && imageFileHeader != nil {
-			uploadImageFolder := "/crowdfunding"
+			uploadImageFolder := "crowdfunding"
 			fileName := imageFileHeader.Filename
 			imageExt := strings.Split(fileName, ".")[1]
 			fileNameImage := fmt.Sprintf("crowdfunding-%d-image-%s.%s", crowdFunding.ID, time.Now().Format("20060102150405"), imageExt)
