@@ -78,14 +78,14 @@ func (crowdService CrowdService) CreateCrowdFunding(userId int64, request reques
 			fileName := imageFileHeader.Filename
 			imageExt := strings.Split(fileName, ".")[1]
 			fileNameImage := fmt.Sprintf("crowdfunding-%d-image-%s.%s", crowdFunding.ID, time.Now().Format("20060102150405"), imageExt)
-			err := fileUploadService.UploadFormFile(imageFile, uploadImageFolder, fileNameImage, imageFileHeader)
+			filePath = uploadImageFolder + "/" + fileNameImage
+			err := fileUploadService.UploadFile(filePath, &imageFile)
 			if err != nil {
 				log.Println(err)
 				//rollback
 				tx.Rollback()
 				return crowdFunding, &bean.AppError{errors.New(err.Error()), "Error occurred, please try again", -1, "error_occurred"}
 			}
-			filePath = uploadImageFolder + "/" + fileNameImage
 		}
 		crowdFundingImage := models.CrowdFundingImage{}
 

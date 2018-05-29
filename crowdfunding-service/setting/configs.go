@@ -7,16 +7,13 @@ import (
 )
 
 type Configuration struct {
-	ServicePort       int
-	DB                string
-	CdnDomain         string
-	CdnHttps          bool
-	GSCredentialsFile string
-	GSBucketName      string
-	UploadFolder      string
-	OriginDomainLocal string
-	OriginDomainRun   []string
-	SolrServiceUrl    string
+	ServicePort          int
+	DB                   string
+	CdnDomain            string
+	CdnHttps             bool
+	SolrServiceUrl       string
+	DispatcherServiceUrl string
+	StorageServiceUrl    string
 }
 
 func (configuration Configuration) String() string {

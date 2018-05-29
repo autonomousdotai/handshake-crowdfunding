@@ -2,11 +2,10 @@ package service
 
 import (
 	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/dao"
-	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/utils/service"
 	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/utils"
 )
 
-var fileUploadService = service.GSService{}
+var fileUploadService = utils.GSService{}
 // service
 var crowdFundingDao = dao.CrowdFundingDao{}
 var crowdFundingImageDao = dao.CrowdFundingImageDao{}
