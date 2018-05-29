@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"mime/multipart"
 	"log"
-	"github.com/autonomousdotai/handshake-services/comment-service/setting"
+	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/setting"
 	"encoding/json"
 	"io/ioutil"
 	"errors"
