@@ -61,7 +61,7 @@ exp = {
     updateActiveFailed: function (tx, id) {
         return modelDB.update(
             {
-                status: constants.PROJECT_ORDER_STATUS_APPROVED_FAILED,
+                status: constants.CROWD_ORDER_STATUS_APPROVED_FAILED,
             },
             {
                 where:
@@ -116,62 +116,47 @@ exp = {
             }, {transaction: tx}
         );
     },
-    updateUnshakedFailedCustomerProjectOrders: function (tx, customer_id, neuron_project_id) {
+    updateUserUnshakeFailed: function (tx, user_id, crowd_funding_id) {
         return modelDB.update(
             {
-                status: constants.PROJECT_ORDER_STATUS_UNSHAKED_FAILED,
+                status: constants.CROWD_ORDER_STATUS_UNSHAKED_FAILED,
             },
             {
                 where:
                     {
-                        customer_id: customer_id,
-                        neuron_project_id: neuron_project_id,
-                        status: constants.PROJECT_ORDER_STATUS_UNSHAKED_PROCESS,
+                        user_id: user_id,
+                        crowd_funding_id: crowd_funding_id,
+                        status: constants.CROWD_ORDER_STATUS_UNSHAKED_PROCESS,
                     }
             }, {transaction: tx}
         );
     },
-    updateCanceledFailedCustomerProjectOrders: function (tx, customer_id, neuron_project_id) {
+    updateUserCancelFailed: function (tx, user_id, crowd_funding_id) {
         return modelDB.update(
             {
-                status: constants.PROJECT_ORDER_STATUS_CANCELED_FAILED,
+                status: constants.CROWD_ORDER_STATUS_CANCELED_FAILED,
             },
             {
                 where:
                     {
-                        customer_id: customer_id,
-                        neuron_project_id: neuron_project_id,
-                        status: constants.PROJECT_ORDER_STATUS_CANCELED_PROCESS,
+                        user_id: user_id,
+                        crowd_funding_id: crowd_funding_id,
+                        status: constants.CROWD_ORDER_STATUS_CANCELED_PROCESS,
                     }
             }, {transaction: tx}
         );
     },
-    updateRefundedCustomerProjectOrders: function (tx, customer_id, neuron_project_id) {
+    updateUserRefundFailed: function (tx, user_id, crowd_funding_id) {
         return modelDB.update(
             {
-                status: constants.PROJECT_ORDER_STATUS_REFUNDED,
+                status: constants.CROWD_ORDER_STATUS_REFUNDED_FAILED,
             },
             {
                 where:
                     {
-                        customer_id: customer_id,
-                        neuron_project_id: neuron_project_id,
-                        status: constants.PROJECT_ORDER_STATUS_REFUNDED_PROCESS,
-                    }
-            }, {transaction: tx}
-        );
-    },
-    updateRefundedFailedCustomerProjectOrders: function (tx, customer_id, neuron_project_id) {
-        return modelDB.update(
-            {
-                status: constants.PROJECT_ORDER_STATUS_REFUNDED_FAILED,
-            },
-            {
-                where:
-                    {
-                        customer_id: customer_id,
-                        neuron_project_id: neuron_project_id,
-                        status: constants.PROJECT_ORDER_STATUS_REFUNDED_PROCESS,
+                        user_id: user_id,
+                        crowd_funding_id: crowd_funding_id,
+                        status: constants.CROWD_ORDER_STATUS_REFUNDED_PROCESS,
                     }
             }, {transaction: tx}
         );

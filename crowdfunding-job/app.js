@@ -276,7 +276,7 @@ async function processEventObj(contractAddress, eventName, eventObj) {
                     //         if (project != null && project.status > 0) {
                     //             if (project.id > 0 && state == constants.CROWSALE_STATE_CANCELED && project.status != constants.PROJECT_STATUS_CANCELED) {
                     //                 await crowdFundingDAO.updateCanceled(tx, project.id)
-                    //                 console.log("__stop projectDAO.updateCanceled OK", project.id);
+                    //                 console.log("__stop crowdFundingDAO.updateCanceled OK", project.id);
                     //             }
                     //             let tns = await ethTxDAO.getByHash(tx_hash);
                     //             if (tns == null) {
@@ -363,8 +363,146 @@ async function asyncScanEventLog(contract, contractAddress, eventName) {
 
 }
 
+async function processTx(id, user_id, hash, ref_type, ref_id, date_created) {
+    let tx = await modelDB.transaction();
+    try {
+        let txr = null;
+        try {
+            txr = await web3.eth.getTransactionReceipt(hash);
+        } catch (err) {
+            console.log('error', err)
+            txr = null;
+        }
+        let is_failed = false
+        if (txr == null) {
+            let now = new Date()
+            if (now - date_created > 24 * 60 * 60 * 1000) {
+                is_failed = true
+            } else {
+                await ethTxDAO.updateStatus(tx, hash, 0);
+                console.log('txr is null', hash);
+                tx.commit();
+                return
+            }
+        } else {
+            console.log('txr is ok', txr);
+            let txrJson = JSON.stringify(txr);
+            await ethTxDAO.updateInfo(tx, id, txr.from, txr.to, new Date(), txr.blockNumber, 0, 0, txrJson);
+            is_failed = (txr.status == '1' || txr.status == '0x1') ? false : true;
+        }
+        if (is_failed) {
+            if (txr != null) {
+                await ethTxDAO.updateStatus(tx, hash, 2);
+            } else {
+                await ethTxDAO.updateStatus(tx, hash, 3);
+            }
+        } else {
+            await ethTxDAO.updateStatus(tx, hash, 1);
+        }
+        switch (ref_type) {
+            case 'crowd_init':{
+                if (is_failed) {
+                    let crowdFunding = await crowdFundingDAO.getById(ref_id);
+                    if (crowdFunding == null) {
+                        console.log(ref_type + ' crowdFundingDAO.getById NULL', ref_id);
+                        break;
+                    }
+                    console.log(ref_type + ' crowdFundingDAO.getById OK', ref_id);
+                    await crowdFundingDAO.updateActiveFailed(tx, crowdFunding.id);
+                    console.log(ref_type + ' crowdFundingDAO.updateNewFailed OK', crowdFunding.id);
+                }
+            }
+                break;
+            case 'crowd_shake':{
+                if (is_failed) {
+                    let crowdFundingShaked = await crowdFundingShakedDAO.getById(ref_id);
+                    if (crowdFundingShaked == null) {
+                        console.log(ref_type + ' crowdFundingShakedDAO.getById NULL', ref_id);
+                        break;
+                    }
+                    console.log(ref_type + ' crowdFundingShakedDAO.getById OK', ref_id);
+                    await crowdFundingShakedDAO.updateActiveFailed(tx, crowdFundingShaked.id);
+                    console.log(ref_type + ' crowdFundingShakedDAO.updateNewFailed OK', crowdFundingShaked.id);
+                }
+            }
+                break;
+            case 'crowd_unshake':{
+                if (is_failed) {
+                    let crowdFunding = await crowdFundingDAO.getById(ref_id);
+                    if (crowdFunding == null) {
+                        console.log(ref_type + ' crowdFundingDAO.getById NULL', ref_id);
+                        break;
+                    }
+                    console.log(ref_type + ' crowdFundingDAO.getById OK', ref_id);
+                    if (crowdFunding.id > 0) {
+                        await crowdFundingShakedDAO.updateUserUnshakeFailed(tx, user_id, crowdFunding.id);
+                        console.log("__cancel crowdFundingShakedDAO.updateUserUnshakeFailed OK", user_id, crowdFunding.id);
+                    }
+                }
+            }
+                break;
+            case 'crowd_cancel':{
+                if (is_failed) {
+                    let crowdFunding = await crowdFundingDAO.getById(ref_id);
+                    if (crowdFunding == null) {
+                        console.log(ref_type + ' crowdFundingDAO.getById NULL', ref_id);
+                        break;
+                    }
+                    console.log(ref_type + ' crowdFundingDAO.getById OK', ref_id);
+                    if (crowdFunding.id > 0) {
+                        await crowdFundingShakedDAO.updateUserCancelFailed(tx, user_id, crowdFunding.id);
+                        console.log("cancelProject crowdFundingShakedDAO.updateUserCancelFailed OK", user_id, crowdFunding.id);
+                    }
+                }
+            }
+                break;
+            case 'crowd_refund':{
+                if (is_failed) {
+                    let crowdFunding = await crowdFundingDAO.getById(ref_id);
+                    if (crowdFunding == null) {
+                        console.log(ref_type + ' crowdFundingDAO.getById NULL', ref_id);
+                        break;
+                    }
+                    console.log(ref_type + ' crowdFundingDAO.getById OK', ref_id);
+                    if (crowdFunding.id > 0) {
+                        await crowdFundingShakedDAO.updateUserRefundFailed(tx, user_id, crowdFunding.id);
+                        console.log("refundProject crowdFundingShakedDAO.updateUserRefundFailed OK", user_id, crowdFunding.id);
+                    }
+                }
+            }
+                break;
+            case 'crow_stop':{
+                if (is_failed) {
+                    let crowdFunding = await crowdFundingDAO.getById(ref_id);
+                    if (crowdFunding == null) {
+                        console.log(ref_type + ' crowdFundingDAO.getById NULL', ref_id);
+                        break;
+                    }
+                    console.log(ref_type + ' crowdFundingDAO.getById OK', ref_id);
+                    if (crowdFunding.id > 0) {
+                        await crowdFundingDAO.updateCanceledFailed(tx, crowdFunding.id);
+                        console.log(ref_type + ' crowdFundingDAO.updateCanceledFailed OK', crowdFunding.id);
+                    }
+                }
+            }
+                break;
+        }
+        tx.commit();
+    } catch (err) {
+        console.log('error', err)
+        tx.rollback();
+    }
+}
+
 async function cronJob() {
     console.log('running a task every minute at ' + new Date());
+    console.log('process ether tx');
+    let results = await ethTxDAO.getListUnTx();
+    for (var i = 0; i < results.length; i++) {
+        var result = results[i];
+        await processTx(result.id, result.user_id, result.hash, result.ref_type, result.ref_id, result.date_created);
+    }
+    console.log('process ether events');
     if (crowdsaleContractAddress != '') {
         for (var i = 0; i < crowdsaleContractEventNames.length; i++) {
             var eventName = crowdsaleContractEventNames[i];

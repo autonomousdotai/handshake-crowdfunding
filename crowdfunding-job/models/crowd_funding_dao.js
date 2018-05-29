@@ -38,7 +38,7 @@ exp = {
             }, {transaction: tx}
         );
     },
-    updateNewFailed: function (tx, id) {
+    updateActiveFailed: function (tx, id) {
         return modelDB.update(
             {
                 status: constants.CROWD_STATUS_APPROVED_FAILED,
