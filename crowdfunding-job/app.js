@@ -16,7 +16,7 @@ var constants = require('./constants');
 var Web3 = require('web3');
 web3 = new Web3(new Web3.providers.HttpProvider(config.blockchainNetwork));
 
-var CrowdsaleContract = require('./../contracts/CrowdsaleHandshake.json');
+var CrowdsaleContract = require('./contracts/CrowdsaleHandshake.json');
 var crowdsaleContractAddress = config.crowdsaleContractAddress
 var crowdsaleContractEventNames = ['__init', '__shake', '__unshake', '__cancel', '__refund', '__stop', '__withdraw'];
 var crowdsaleContractIns = new web3.eth.Contract(CrowdsaleContract.abi, crowdsaleContractAddress);

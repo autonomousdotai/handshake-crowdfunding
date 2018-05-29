@@ -15,7 +15,7 @@ exp = {
                 }
             });
     },
-    getLastLogByName: function (address, event_name) {
+    getLastLogByName: function (address, event) {
         address = address.toLowerCase()
         return model
             .findOne({
@@ -23,7 +23,7 @@ exp = {
                     ['id', 'DESC']],
                 where: {
                     address: address,
-                    event_name: event_name,
+                    event: event,
                 }
             });
     },

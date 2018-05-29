@@ -1,6 +1,6 @@
 {
-  "name": "crowdfunding-events",
-  "version": "0.0.0",
+  "name": "crowdfunding-job",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "start": "node ./app.js"
@@ -8,7 +8,7 @@
   "dependencies": {
     "mysql2": "^1.5.3",
     "node-cron": "^1.2.1",
-    "sequelize": "^4.35.1",
-    "web3": "^1.0.0-beta.30"
+    "sequelize": "^4.37.10",
+    "web3": "^1.0.0-beta.20"
   }
 }
