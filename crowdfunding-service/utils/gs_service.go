@@ -59,5 +59,11 @@ func (gsService GSService) UploadFile(file string, sourceFile *multipart.File) e
 		log.Println(err)
 		return err
 	}
+	if val, ok := result["status"]; ok {
+		status := val.(int64)
+		if status != 1 {
+			return errors.New(fmt.Sprintf("response status %d", resp.StatusCode))
+		}
+	}
 	return nil
 }
