@@ -55,7 +55,7 @@ exp = {
         return modelDB.update(
             {
                 balance: balance,
-                shaked_num: modelDB.sequelize.literal('shaked_num + ' + qty),
+                shaked_num: modelDB.sequelize.literal('shake_num + ' + qty),
             },
             {
                 where:

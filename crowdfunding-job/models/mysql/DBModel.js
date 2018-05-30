@@ -80,7 +80,7 @@ var CrowdFunding = db.define('crowd_funding', {
     price: Sequelize.DECIMAL,
     goal: Sequelize.DECIMAL,
     balance: Sequelize.DECIMAL,
-    shaked_num: Sequelize.INTEGER,
+    shake_num: Sequelize.INTEGER,
     status: Sequelize.INTEGER
 }, {
     tableName: 'crowd_funding',
@@ -88,7 +88,7 @@ var CrowdFunding = db.define('crowd_funding', {
     underscored: true
 });
 
-var CrowdFundingShaked = db.define('crowd_funding_shaked', {
+var CrowdFundingShake = db.define('crowd_funding_shake', {
     id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
@@ -118,4 +118,4 @@ module.exports.db = db;
 module.exports.EthEvent = EthEvent;
 module.exports.EthTx = EthTx;
 module.exports.CrowdFunding = CrowdFunding;
-module.exports.CrowdFundingShaked = CrowdFundingShaked;
+module.exports.CrowdFundingShake = CrowdFundingShake;

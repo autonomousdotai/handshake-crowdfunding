@@ -2,7 +2,7 @@ var cron = require('node-cron');
 
 var ethEventDAO = require('./models/eth_event_dao');
 var crowdFundingDAO = require('./models/crowd_funding_dao');
-var crowdFundingShakedDAO = require('./models/crowd_funding_shaked_dao');
+var crowdFundingShakeDAO = require('./models/crowd_funding_shake_dao');
 var ethTxDAO = require('./models/eth_tx_dao');
 
 
@@ -98,7 +98,7 @@ async function processEventObj(contractAddress, eventName, eventObj) {
                         let offchainType = offchains[0];
                         if (offchainType == constants.OFFCHAIN_TYPE_SHAKED) {
                             let crowdFundingId = parseInt(offchains[1]);
-                            let crowdFundingShaked = await crowdFundingShakedDAO.getById(crowdFundingId);
+                            let crowdFundingShaked = await crowdFundingShakeDAO.getById(crowdFundingId);
                             if (crowdFundingShaked == null) {
                                 console.log("__shake crowdFundingShakedDAO.getById NULL", crowdFundingId);
                                 break;
@@ -109,7 +109,7 @@ async function processEventObj(contractAddress, eventName, eventObj) {
                                 if (txr != null) {
                                     address = txr.from
                                 }
-                                await crowdFundingShakedDAO.updateActived(tx, crowdFundingShaked.id, address)
+                                await crowdFundingShakeDAO.updateActived(tx, crowdFundingShaked.id, address)
                                 console.log("__shake crowdFundingShakedDAO.updateActived OK", crowdFundingShaked.id, address)
 
                                 let crowdFunding = await crowdFundingDAO.getById(crowdFundingShaked.crowd_funding_id);
@@ -118,7 +118,7 @@ async function processEventObj(contractAddress, eventName, eventObj) {
 
                                     const balanceEth = Web3.utils.fromWei(balance, 'ether');
                                     let balanceEthU = balanceEth
-                                    let crowdFundingShakedCheck = await crowdFundingShakedDAO.checkUserBacked(crowdFunding.id, crowdFundingShaked.user_id, crowdFundingShaked.id)
+                                    let crowdFundingShakedCheck = await crowdFundingShakeDAO.checkUserBacked(crowdFunding.id, crowdFundingShaked.user_id, crowdFundingShaked.id)
                                     let qtyU = 0;
                                     if (crowdFundingShakedCheck == null) {
                                         qtyU = 1;
@@ -173,7 +173,7 @@ async function processEventObj(contractAddress, eventName, eventObj) {
                                 await crowdFundingDAO.updateShakedInfo(tx, crowdFunding.id, balanceEth, -1);
                                 console.log("__unshake crowdFundingDAO.updateShakedInfo OK", crowdFunding.id, balanceEth, -1);
 
-                                await crowdFundingShakedDAO.updateUserUnshaked(tx, userId, crowdFunding.id);
+                                await crowdFundingShakeDAO.updateUserUnshaked(tx, userId, crowdFunding.id);
                                 console.log("__unshake crowdFundingShakedDAO.updateUserUnshaked OK", userId, crowdFunding.id);
 
                                 let ethTx = await ethTxDAO.getByHash(tx_hash);
@@ -205,7 +205,7 @@ async function processEventObj(contractAddress, eventName, eventObj) {
                             if (crowdFunding != null) {
                                 console.log("__cancel crowdFundingDAO.getByHId OK", hid);
 
-                                await crowdFundingShakedDAO.updateUserCanceled(tx, userId, crowdFunding.id);
+                                await crowdFundingShakeDAO.updateUserCanceled(tx, userId, crowdFunding.id);
                                 console.log("__cancel crowdFundingShakedDAO.updateUserCanceled OK", userId, crowdFunding.id);
 
                                 if (crowdFunding.id > 0 && state == constants.CROWSALE_STATE_CANCELED && crowdFunding.status != constants.CROWD_STATUS_CANCELED) {
@@ -244,7 +244,7 @@ async function processEventObj(contractAddress, eventName, eventObj) {
                             if (crowdFunding != null && crowdFunding.status > 0) {
                                 console.log("__refund crowdFundingDAO.getByHId OK", hid);
 
-                                await crowdFundingShakedDAO.updateUserRefunded(tx, userId, crowdFunding.id);
+                                await crowdFundingShakeDAO.updateUserRefunded(tx, userId, crowdFunding.id);
                                 console.log("__refund crowdFundingShakedDAO.updateUserRefunded OK", userId, crowdFunding.id);
 
                                 let ethTx = await ethTxDAO.getByHash(tx_hash);
@@ -415,13 +415,13 @@ async function processTx(id, user_id, hash, ref_type, ref_id, date_created) {
                 break;
             case 'crowd_shake':{
                 if (is_failed) {
-                    let crowdFundingShaked = await crowdFundingShakedDAO.getById(ref_id);
+                    let crowdFundingShaked = await crowdFundingShakeDAO.getById(ref_id);
                     if (crowdFundingShaked == null) {
                         console.log(ref_type + ' crowdFundingShakedDAO.getById NULL', ref_id);
                         break;
                     }
                     console.log(ref_type + ' crowdFundingShakedDAO.getById OK', ref_id);
-                    await crowdFundingShakedDAO.updateActiveFailed(tx, crowdFundingShaked.id);
+                    await crowdFundingShakeDAO.updateActiveFailed(tx, crowdFundingShaked.id);
                     console.log(ref_type + ' crowdFundingShakedDAO.updateNewFailed OK', crowdFundingShaked.id);
                 }
             }
@@ -435,7 +435,7 @@ async function processTx(id, user_id, hash, ref_type, ref_id, date_created) {
                     }
                     console.log(ref_type + ' crowdFundingDAO.getById OK', ref_id);
                     if (crowdFunding.id > 0) {
-                        await crowdFundingShakedDAO.updateUserUnshakeFailed(tx, user_id, crowdFunding.id);
+                        await crowdFundingShakeDAO.updateUserUnshakeFailed(tx, user_id, crowdFunding.id);
                         console.log("__cancel crowdFundingShakedDAO.updateUserUnshakeFailed OK", user_id, crowdFunding.id);
                     }
                 }
@@ -450,7 +450,7 @@ async function processTx(id, user_id, hash, ref_type, ref_id, date_created) {
                     }
                     console.log(ref_type + ' crowdFundingDAO.getById OK', ref_id);
                     if (crowdFunding.id > 0) {
-                        await crowdFundingShakedDAO.updateUserCancelFailed(tx, user_id, crowdFunding.id);
+                        await crowdFundingShakeDAO.updateUserCancelFailed(tx, user_id, crowdFunding.id);
                         console.log("cancelProject crowdFundingShakedDAO.updateUserCancelFailed OK", user_id, crowdFunding.id);
                     }
                 }
@@ -465,7 +465,7 @@ async function processTx(id, user_id, hash, ref_type, ref_id, date_created) {
                     }
                     console.log(ref_type + ' crowdFundingDAO.getById OK', ref_id);
                     if (crowdFunding.id > 0) {
-                        await crowdFundingShakedDAO.updateUserRefundFailed(tx, user_id, crowdFunding.id);
+                        await crowdFundingShakeDAO.updateUserRefundFailed(tx, user_id, crowdFunding.id);
                         console.log("refundProject crowdFundingShakedDAO.updateUserRefundFailed OK", user_id, crowdFunding.id);
                     }
                 }

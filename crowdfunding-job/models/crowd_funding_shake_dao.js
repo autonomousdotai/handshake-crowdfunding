@@ -1,7 +1,7 @@
 var Sequelize = require('sequelize');
 
 var sqldb = require('./mysql/DBModel');
-var modelDB = sqldb.CrowdFundingShaked;
+var modelDB = sqldb.CrowdFundingShake;
 var constants = require('../constants');
 
 exp = {
