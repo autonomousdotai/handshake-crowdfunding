@@ -40,6 +40,13 @@ func main() {
 			context.JSON(http.StatusOK, result)
 		})
 	}
+	router.NoRoute(func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  0,
+			"message": "Page not found",
+		})
+	})
+
 	api := api.Api{}
 	api.Init(router)
 	router.Run(fmt.Sprintf(":%d", configuration.ServicePort))
