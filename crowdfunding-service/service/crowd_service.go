@@ -279,43 +279,36 @@ func (crowdService CrowdService) RefundCrowdFunding(userId int64, crowdFundingId
 func (crowdService CrowdService) MakeObjectToIndex(crowdFundingId int64) (error) {
 	crowdFunding := crowdFundingDao.GetFullById(crowdFundingId)
 
-	//id: string (required). `uid of handshake`
-	//hid_s: string. `handshake id on blockchain`
-	//type_i: int (required). `type of handshake. (betting, exchange, v.v…)`
-	//state_i: int (required, default: 0). `state of handshake. (0: new, 1: publish)`
-	//status_i: int (required, default: base on team). `status of handshake. (inited, shaked, v.v…)`
-	//init_user_id_i: int (required). `id of user create handshake.`
-	//shaked_user_ids_is: array int. `id of users shaked with this handshake`
-	//text_search_ss: array string (optional). `Purpose fulltext search only`
-	//shake_count_i: int (default: 0). `count shake`
-	//view_count_i: int (default: 0). `count view`
-	//comment_count_i: int (default: 0). `count comment`
-	//is_private_i: int (default: 0). `public or private handshake`
-	//init_at_i: int (default: current timestamp). `Date init handshake as timestamp`
-	//last_update_at_i: int (default: current timestamp). `Date last update handshake as timestamp`
-	//custom field… (edited)
+	crowdFundingImages := crowdFundingImageDao.GetByCrowdId(crowdFunding.ID)
+	imageUrls := []string{}
+	for _, crowdFundingImage := range crowdFundingImages {
+		imageUrls = append(imageUrls, crowdFundingImage.Image)
+	}
 
 	document := map[string]interface{}{
 		"add": [] interface{}{
 			map[string]interface{}{
-				"id":                  fmt.Sprintf("crowd_%d", crowdFunding.ID),
-				"hid_s":               "",
-				"type_i":              1,
-				"state_i":             0,
-				"init_user_id_i":      crowdFunding.UserId,
-				"shaked_user_ids_is":  []int64{},
-				"text_search_ss":      []string{crowdFunding.Name, crowdFunding.Description, crowdFunding.ShortDescription},
-				"shake_count_i":       crowdFunding.ShakeNum,
-				"view_count_i":        0,
-				"comment_count_i":     0,
-				"is_private_i":        1,
-				"init_at_i":           crowdFunding.DateCreated.Unix(),
-				"last_update_at_i":    crowdFunding.DateModified.Unix(),
+				"id":                fmt.Sprintf("crowd_%d", crowdFunding.ID),
+				"hid_s":             "",
+				"type_i":            1,
+				"state_i":           0,
+				"init_user_id_i":    crowdFunding.UserId,
+				"shake_user_ids_is": []int64{},
+				"text_search_ss":    []string{crowdFunding.Name, crowdFunding.Description, crowdFunding.ShortDescription},
+				"shake_count_i":     crowdFunding.ShakeNum,
+				"view_count_i":      0,
+				"comment_count_i":   0,
+				"is_private_i":      1,
+				"init_at_i":         crowdFunding.DateCreated.Unix(),
+				"last_update_at_i":  crowdFunding.DateModified.Unix(),
+				//custom fileds
 				"name_s":              crowdFunding.Name,
 				"short_description_s": crowdFunding.ShortDescription,
 				"goal_f":              crowdFunding.Goal,
 				"balance_f":           crowdFunding.Balance,
-				"crowd_date_i":        crowdFunding.CrowdDate,
+				"crowd_date_i":        crowdFunding.CrowdDate.Unix(),
+				"deliver_date_i":      crowdFunding.DeliverDate.Unix(),
+				"image_ss":            imageUrls,
 			},
 		},
 	}
@@ -338,6 +331,9 @@ func (crowdService CrowdService) MakeObjectToIndex(crowdFundingId int64) (error)
 	if err != nil {
 		log.Println(err)
 		return err
+	}
+	if result.Success == false {
+		return errors.New("update solr result false")
 	}
 	return nil
 }

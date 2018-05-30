@@ -10,7 +10,7 @@ import (
 type CrowdFundingImageDao struct {
 }
 
-func (crowdFundingImageDao CrowdFundingImageDao) GetById(id int) (models.CrowdFundingImage) {
+func (crowdFundingImageDao CrowdFundingImageDao) GetById(id int64) (models.CrowdFundingImage) {
 	dto := models.CrowdFundingImage{}
 	err := models.Database().Where("id = ?", id).First(&dto).Error
 	if err != nil {
@@ -56,4 +56,13 @@ func (crowdFundingImageDao CrowdFundingImageDao) Delete(dto models.CrowdFundingI
 		return dto, err
 	}
 	return dto, nil
+}
+
+func (crowdFundingImageDao CrowdFundingImageDao) GetByCrowdId(crowdFundingId int64) ([]models.CrowdFundingImage) {
+	dtos := []models.CrowdFundingImage{}
+	err := models.Database().Where("crowd_funding_id = ?", crowdFundingId).Find(&dtos).Error
+	if err != nil {
+		log.Print(err)
+	}
+	return dtos
 }

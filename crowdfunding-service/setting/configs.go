@@ -4,6 +4,7 @@ import (
 	"os"
 	"log"
 	"encoding/json"
+	"strconv"
 )
 
 type Configuration struct {
@@ -27,19 +28,15 @@ func (configuration Configuration) String() string {
 var configuration *Configuration = nil
 
 func LoadConfig() (*Configuration, error) {
-	// Load configuration
-	file, err := os.Open("setting/conf.json")
-	if err != nil {
-		log.Println("error:", err)
-	}
-	decoder := json.NewDecoder(file)
 	configuration := Configuration{}
-	errJson := decoder.Decode(&configuration)
-	if errJson != nil {
-		log.Println("error:", errJson)
-		return nil, err
-	}
-	// End load config
+
+	configuration.ServicePort, _ = strconv.Atoi(os.Getenv("SERVICE_PORT"))
+	configuration.DB = os.Getenv("DB")
+	configuration.CdnDomain = os.Getenv("CDN_DOMAIN")
+	configuration.CdnHttps, _ = strconv.ParseBool(os.Getenv("CDN_HTTPS"))
+	configuration.DispatcherServiceUrl = os.Getenv("DISPATCHER_SERVICE_URL")
+	configuration.StorageServiceUrl = os.Getenv("STORAGE_SERVICE_URL")
+
 	return &configuration, nil
 }
 
