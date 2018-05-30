@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type CrowdFundingShaked struct {
+type CrowdFundingShake struct {
 	DateCreated    time.Time
 	DateModified   time.Time
 	ID             int64
@@ -19,6 +19,6 @@ type CrowdFundingShaked struct {
 	Status         int
 }
 
-func (CrowdFundingShaked) TableName() string {
-	return "crowd_funding_shaked"
+func (CrowdFundingShake) TableName() string {
+	return "crowd_funding_shake"
 }

@@ -7,11 +7,11 @@ import (
 	"time"
 )
 
-type CrowdFundingShakedDao struct {
+type CrowdFundingShakeDao struct {
 }
 
-func (crowdFundingShakedDao CrowdFundingShakedDao) GetById(id int) (models.CrowdFundingShaked) {
-	dto := models.CrowdFundingShaked{}
+func (crowdFundingShakeDao CrowdFundingShakeDao) GetById(id int) (models.CrowdFundingShake) {
+	dto := models.CrowdFundingShake{}
 	err := models.Database().Where("id = ?", id).First(&dto).Error
 	if err != nil {
 		log.Print(err)
@@ -19,7 +19,7 @@ func (crowdFundingShakedDao CrowdFundingShakedDao) GetById(id int) (models.Crowd
 	return dto
 }
 
-func (crowdFundingShakedDao CrowdFundingShakedDao) Create(dto models.CrowdFundingShaked, tx *gorm.DB) (models.CrowdFundingShaked, error) {
+func (crowdFundingShakedDao CrowdFundingShakeDao) Create(dto models.CrowdFundingShake, tx *gorm.DB) (models.CrowdFundingShake, error) {
 	if tx == nil {
 		tx = models.Database()
 	}
@@ -33,7 +33,7 @@ func (crowdFundingShakedDao CrowdFundingShakedDao) Create(dto models.CrowdFundin
 	return dto, nil
 }
 
-func (crowdFundingShakedDao CrowdFundingShakedDao) Update(dto models.CrowdFundingShaked, tx *gorm.DB) (models.CrowdFundingShaked, error) {
+func (crowdFundingShakedDao CrowdFundingShakeDao) Update(dto models.CrowdFundingShake, tx *gorm.DB) (models.CrowdFundingShake, error) {
 	if tx == nil {
 		tx = models.Database()
 	}
@@ -46,7 +46,7 @@ func (crowdFundingShakedDao CrowdFundingShakedDao) Update(dto models.CrowdFundin
 	return dto, nil
 }
 
-func (crowdFundingShakedDao CrowdFundingShakedDao) Delete(dto models.CrowdFundingShaked, tx *gorm.DB) (models.CrowdFundingShaked, error) {
+func (crowdFundingShakedDao CrowdFundingShakeDao) Delete(dto models.CrowdFundingShake, tx *gorm.DB) (models.CrowdFundingShake, error) {
 	if tx == nil {
 		tx = models.Database()
 	}

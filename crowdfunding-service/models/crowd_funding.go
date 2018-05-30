@@ -20,10 +20,10 @@ type CrowdFunding struct {
 	Price              float64
 	Goal               float64
 	Balance            float64
-	ShakedNum          int
+	ShakeNum           int
 	Status             int
 	CrowdFundingImages []CrowdFundingImage
-	CrowdFundingShaked CrowdFundingShaked
+	CrowdFundingShake  CrowdFundingShake
 }
 
 func (CrowdFunding) TableName() string {

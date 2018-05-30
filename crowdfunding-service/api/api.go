@@ -24,8 +24,8 @@ func (api Api) Init(router *gin.Engine) *gin.Engine {
 	router.GET("/:crowd_funding_id", func(context *gin.Context) {
 		api.GetCrowdFunding(context)
 	})
-	router.POST("/shaked/:crowd_funding_id", func(context *gin.Context) {
-		api.ShakedCrowdFunding(context)
+	router.POST("/shake/:crowd_funding_id", func(context *gin.Context) {
+		api.UserShake(context)
 	})
 	return router
 }
@@ -158,7 +158,7 @@ func (self Api) GetCrowdFunding(context *gin.Context) {
 	return
 }
 
-func (self Api) ShakedCrowdFunding(context *gin.Context) {
+func (self Api) UserShake(context *gin.Context) {
 	result := new(response_obj.ResponseObject)
 
 	userId, ok := context.Get("UserId")
@@ -188,7 +188,7 @@ func (self Api) ShakedCrowdFunding(context *gin.Context) {
 	address := context.Query("address")
 	hash := context.Query("hash")
 
-	crowdFungingShaked, appErr := crowdService.ShakedCrowdFunding(userId.(int64), crowdFungingId, quantity, address, hash)
+	crowdFungingShaked, appErr := crowdService.UserShake(userId.(int64), crowdFungingId, quantity, address, hash)
 	if appErr != nil {
 		log.Print(appErr.OrgError)
 		result.SetStatus(bean.UnexpectedError)

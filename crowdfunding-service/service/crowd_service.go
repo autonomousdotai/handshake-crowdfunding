@@ -141,37 +141,37 @@ func (crowdService CrowdService) GetCrowdFunding(userId int64, crowdFundingId in
 	return crowdFunding, nil
 }
 
-func (crowdService CrowdService) ShakedCrowdFunding(userId int64, crowdFundingId int64, quantity int, address string, hash string) (models.CrowdFundingShaked, *bean.AppError) {
-	crowdFundingShaked := models.CrowdFundingShaked{}
+func (crowdService CrowdService) UserShake(userId int64, crowdFundingId int64, quantity int, address string, hash string) (models.CrowdFundingShake, *bean.AppError) {
+	crowdFundingShake := models.CrowdFundingShake{}
 
 	if quantity <= 0 {
-		return crowdFundingShaked, &bean.AppError{errors.New("quantity is invalid"), "quantity is invalid", -1, "error_occurred"}
+		return crowdFundingShake, &bean.AppError{errors.New("quantity is invalid"), "quantity is invalid", -1, "error_occurred"}
 	}
 
 	crowdFunding := crowdFundingDao.GetFullById(crowdFundingId)
 	if crowdFunding.ID <= 0 {
-		return crowdFundingShaked, &bean.AppError{errors.New("crowdFundingId is invalid"), "crowdFundingId is invalid", -1, "error_occurred"}
+		return crowdFundingShake, &bean.AppError{errors.New("crowdFundingId is invalid"), "crowdFundingId is invalid", -1, "error_occurred"}
 	}
 
-	crowdFundingShaked.UserId = userId
-	crowdFundingShaked.CrowdFundingId = crowdFundingId
-	crowdFundingShaked.Quantity = quantity
-	crowdFundingShaked.Amount = float64(crowdFundingShaked.Quantity) * crowdFunding.Price
-	crowdFundingShaked.Status = utils.CROWD_ORDER_STATUS_NEW
+	crowdFundingShake.UserId = userId
+	crowdFundingShake.CrowdFundingId = crowdFundingId
+	crowdFundingShake.Quantity = quantity
+	crowdFundingShake.Amount = float64(crowdFundingShake.Quantity) * crowdFunding.Price
+	crowdFundingShake.Status = utils.CROWD_ORDER_STATUS_NEW
 
-	crowdFundingShaked, err := crowdFundingShakedDao.Create(crowdFundingShaked, nil)
+	crowdFundingShake, err := crowdFundingShakeDao.Create(crowdFundingShake, nil)
 	if err != nil {
 		log.Println(err)
-		return crowdFundingShaked, &bean.AppError{errors.New(err.Error()), "Error occurred, please try again", -1, "error_occurred"}
+		return crowdFundingShake, &bean.AppError{errors.New(err.Error()), "Error occurred, please try again", -1, "error_occurred"}
 	}
 
-	_, appErr := crowdService.CreateTx(userId, address, hash, "crowd_shake", crowdFundingShaked.ID, nil)
+	_, appErr := crowdService.CreateTx(userId, address, hash, "crowd_shake", crowdFundingShake.ID, nil)
 	if appErr != nil {
 		log.Println(appErr.OrgError)
-		return crowdFundingShaked, appErr
+		return crowdFundingShake, appErr
 	}
 
-	return crowdFundingShaked, nil
+	return crowdFundingShake, nil
 }
 
 func (crowdService CrowdService) UnshakeCrowdFunding(userId int64, crowdFundingId int64, address string, hash string) (*bean.AppError) {
@@ -179,7 +179,7 @@ func (crowdService CrowdService) UnshakeCrowdFunding(userId int64, crowdFundingI
 	if crowdFunding.ID <= 0 {
 		return &bean.AppError{errors.New("crowdFundingId is invalid"), "crowdFundingId is invalid", -1, "error_occurred"}
 	}
-	crowdFundingShaked := crowdFunding.CrowdFundingShaked
+	crowdFundingShaked := crowdFunding.CrowdFundingShake
 
 	if crowdFundingShaked.ID <= 0 || crowdFundingShaked.Status <= 0 {
 		return &bean.AppError{errors.New("crowdFunding is not shaked"), "crowdFunding is not shaked", -1, "error_occurred"}
@@ -196,7 +196,7 @@ func (crowdService CrowdService) UnshakeCrowdFunding(userId int64, crowdFundingI
 	}
 
 	crowdFundingShaked.Status = utils.CROWD_ORDER_STATUS_UNSHAKED_PROCESS
-	crowdFundingShaked, err := crowdFundingShakedDao.Update(crowdFundingShaked, tx)
+	crowdFundingShaked, err := crowdFundingShakeDao.Update(crowdFundingShaked, tx)
 	if err != nil {
 		log.Println(err)
 
@@ -213,7 +213,7 @@ func (crowdService CrowdService) CancelCrowdFunding(userId int64, crowdFundingId
 	if crowdFunding.ID <= 0 {
 		return &bean.AppError{errors.New("crowdFundingId is invalid"), "crowdFundingId is invalid", -1, "error_occurred"}
 	}
-	crowdFundingShaked := crowdFunding.CrowdFundingShaked
+	crowdFundingShaked := crowdFunding.CrowdFundingShake
 
 	if crowdFundingShaked.ID <= 0 || crowdFundingShaked.Status <= 0 {
 		return &bean.AppError{errors.New("crowdFunding is not shaked"), "crowdFunding is not shaked", -1, "error_occurred"}
@@ -230,7 +230,7 @@ func (crowdService CrowdService) CancelCrowdFunding(userId int64, crowdFundingId
 	}
 
 	crowdFundingShaked.Status = utils.CROWD_ORDER_STATUS_CANCELED_PROCESS
-	crowdFundingShaked, err := crowdFundingShakedDao.Update(crowdFundingShaked, tx)
+	crowdFundingShaked, err := crowdFundingShakeDao.Update(crowdFundingShaked, tx)
 	if err != nil {
 		log.Println(err)
 
@@ -247,7 +247,7 @@ func (crowdService CrowdService) RefundCrowdFunding(userId int64, crowdFundingId
 	if crowdFunding.ID <= 0 {
 		return &bean.AppError{errors.New("crowdFundingId is invalid"), "crowdFundingId is invalid", -1, "error_occurred"}
 	}
-	crowdFundingShaked := crowdFunding.CrowdFundingShaked
+	crowdFundingShaked := crowdFunding.CrowdFundingShake
 
 	if crowdFundingShaked.ID <= 0 || crowdFundingShaked.Status <= 0 {
 		return &bean.AppError{errors.New("crowdFunding is not shaked"), "crowdFunding is not shaked", -1, "error_occurred"}
@@ -264,7 +264,7 @@ func (crowdService CrowdService) RefundCrowdFunding(userId int64, crowdFundingId
 	}
 
 	crowdFundingShaked.Status = utils.CROWD_ORDER_STATUS_REFUNDED_PROCESS
-	crowdFundingShaked, err := crowdFundingShakedDao.Update(crowdFundingShaked, tx)
+	crowdFundingShaked, err := crowdFundingShakeDao.Update(crowdFundingShaked, tx)
 	if err != nil {
 		log.Println(err)
 
@@ -279,20 +279,43 @@ func (crowdService CrowdService) RefundCrowdFunding(userId int64, crowdFundingId
 func (crowdService CrowdService) MakeObjectToIndex(crowdFundingId int64) (error) {
 	crowdFunding := crowdFundingDao.GetFullById(crowdFundingId)
 
+	//id: string (required). `uid of handshake`
+	//hid_s: string. `handshake id on blockchain`
+	//type_i: int (required). `type of handshake. (betting, exchange, v.v…)`
+	//state_i: int (required, default: 0). `state of handshake. (0: new, 1: publish)`
+	//status_i: int (required, default: base on team). `status of handshake. (inited, shaked, v.v…)`
+	//init_user_id_i: int (required). `id of user create handshake.`
+	//shaked_user_ids_is: array int. `id of users shaked with this handshake`
+	//text_search_ss: array string (optional). `Purpose fulltext search only`
+	//shake_count_i: int (default: 0). `count shake`
+	//view_count_i: int (default: 0). `count view`
+	//comment_count_i: int (default: 0). `count comment`
+	//is_private_i: int (default: 0). `public or private handshake`
+	//init_at_i: int (default: current timestamp). `Date init handshake as timestamp`
+	//last_update_at_i: int (default: current timestamp). `Date last update handshake as timestamp`
+	//custom field… (edited)
+
 	document := map[string]interface{}{
 		"add": [] interface{}{
 			map[string]interface{}{
-				"id":                fmt.Sprintf("crowd_%d", crowdFunding.ID),
-				"type":              "handshake",
-				"name":              crowdFunding.Name,
-				"short_description": crowdFunding.ShortDescription,
-				"description":       crowdFunding.Description,
-				"goal":              crowdFunding.Goal,
-				"balance":           crowdFunding.Balance,
-				"shaked_num":        crowdFunding.ShakedNum,
-				"crowd_date":        crowdFunding.CrowdDate,
-				"deliver_date":      crowdFunding.DeliverDate,
-				"status":            crowdFunding.Status,
+				"id":                  fmt.Sprintf("crowd_%d", crowdFunding.ID),
+				"hid_s":               "",
+				"type_i":              1,
+				"state_i":             0,
+				"init_user_id_i":      crowdFunding.UserId,
+				"shaked_user_ids_is":  []int64{},
+				"text_search_ss":      []string{crowdFunding.Name, crowdFunding.Description, crowdFunding.ShortDescription},
+				"shake_count_i":       crowdFunding.ShakeNum,
+				"view_count_i":        0,
+				"comment_count_i":     0,
+				"is_private_i":        1,
+				"init_at_i":           crowdFunding.DateCreated.Unix(),
+				"last_update_at_i":    crowdFunding.DateModified.Unix(),
+				"name_s":              crowdFunding.Name,
+				"short_description_s": crowdFunding.ShortDescription,
+				"goal_f":              crowdFunding.Goal,
+				"balance_f":           crowdFunding.Balance,
+				"crowd_date_i":        crowdFunding.CrowdDate,
 			},
 		},
 	}

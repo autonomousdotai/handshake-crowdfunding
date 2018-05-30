@@ -36,7 +36,7 @@ func (crowdFundingDao CrowdFundingDao) GetFullByUser(userId int64, id int64) (mo
 	db := models.Database()
 	db = db.Preload("CrowdFundingImages")
 	if userId > 0 {
-		db = db.Preload("CrowdFundingShaked", "status > 0 AND user_id = ?", userId)
+		db = db.Preload("CrowdFundingShake", "status > 0 AND user_id = ?", userId)
 	}
 	db = db.Where("id = ?", id)
 	err := db.First(&dto).Error
