@@ -18,7 +18,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
-	"github.com/algolia/algoliasearch-client-go/algoliasearch"
+	"github.com/rtt/Go-Solr"
 )
 
 type CrowdService struct {
@@ -310,7 +310,7 @@ func (crowdService CrowdService) MakeObjectToIndex(crowdFundingId int64) (error)
 	if err != nil {
 		return err
 	}
-	result := algoliasearch.BatchRes{}
+	result := solr.UpdateResponse{}
 	err = json.Unmarshal(bodyBytes, &result)
 	if err != nil {
 		log.Println(err)
