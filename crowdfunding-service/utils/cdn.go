@@ -1,21 +1,20 @@
 package utils
 
 import (
-	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/setting"
+	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/configs"
 )
 
 func CdnUrlFor(fileUrl string) string {
 	if fileUrl == "" {
 		return ""
 	}
-	configuration := setting.CurrentConfig()
 	result := ""
-	if configuration.CdnHttps == true {
+	if configs.CdnHttps == true {
 		result += "https://"
 	} else {
 		result += "http://"
 	}
-	result += configuration.CdnDomain + "/" + fileUrl
+	result += configs.CdnDomain + "/" + fileUrl
 	return result
 }
 
@@ -23,13 +22,12 @@ func CdnUrlFor2(filePath string, fileUrl string) string {
 	if fileUrl == "" {
 		return ""
 	}
-	configuration := setting.CurrentConfig()
 	result := ""
-	if configuration.CdnHttps == true {
+	if configs.CdnHttps == true {
 		result += "https://"
 	} else {
 		result += "http://"
 	}
-	result += configuration.CdnDomain + "/" + filePath + fileUrl
+	result += configs.CdnDomain + "/" + filePath + fileUrl
 	return result
 }

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"mime/multipart"
 	"log"
-	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/setting"
+	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/configs"
 	"encoding/json"
 	"io/ioutil"
 	"errors"
@@ -26,7 +26,7 @@ func (gsService GSService) UploadFile(file string, sourceFile *multipart.File) e
 	filePostBytes := bytes.NewReader(buffer)
 
 	var urlReq *url.URL
-	urlReq, err = url.Parse(setting.CurrentConfig().StorageServiceUrl)
+	urlReq, err = url.Parse(configs.StorageServiceUrl)
 	if err != nil {
 		return err
 	}

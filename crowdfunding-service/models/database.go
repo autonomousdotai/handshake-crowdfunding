@@ -3,7 +3,7 @@ package models
 import (
 	"github.com/jinzhu/gorm"
 	"log"
-	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/setting"
+	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/configs"
 )
 
 var databaseConn *gorm.DB = nil
@@ -11,7 +11,7 @@ var databaseConn *gorm.DB = nil
 func Database() *gorm.DB {
 	//open a db connection
 	if databaseConn == nil {
-		d, err := gorm.Open("mysql", setting.CurrentConfig().DB)
+		d, err := gorm.Open("mysql", configs.DB)
 		d.LogMode(true)
 		if err != nil {
 			log.Println(err)

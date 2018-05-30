@@ -7,7 +7,7 @@ import (
 	"mime/multipart"
 	"strings"
 	"time"
-	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/setting"
+	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/configs"
 	"log"
 	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/request_obj"
 	"github.com/autonomousdotai/handshake-crowdfunding/crowdfunding-service/utils"
@@ -317,7 +317,7 @@ func (crowdService CrowdService) MakeObjectToIndex(crowdFundingId int64) (error)
 	if err != nil {
 		return err
 	}
-	req, err := http.NewRequest("POST", setting.CurrentConfig().SolrServiceUrl+"/handshake/update", bytes.NewBuffer(jsonStr))
+	req, err := http.NewRequest("POST", configs.SolrServiceUrl+"/handshake/update", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		return err
 	}
