@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/autonomousdotai/handshake-crowdfunding/service"
+	"github.com/ninjadotorg/handshake-crowdfunding/service"
 )
 
 // service

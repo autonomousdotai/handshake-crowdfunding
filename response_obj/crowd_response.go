@@ -2,8 +2,8 @@ package response_obj
 
 import (
 	"time"
-	"github.com/autonomousdotai/handshake-crowdfunding/models"
-	"github.com/autonomousdotai/handshake-crowdfunding/utils"
+	"github.com/ninjadotorg/handshake-crowdfunding/models"
+	"github.com/ninjadotorg/handshake-crowdfunding/utils"
 )
 
 type CrowdFundingResponse struct {

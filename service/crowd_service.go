@@ -1,16 +1,16 @@
 package service
 
 import (
-	"github.com/autonomousdotai/handshake-crowdfunding/models"
-	"github.com/autonomousdotai/handshake-crowdfunding/bean"
+	"github.com/ninjadotorg/handshake-crowdfunding/models"
+	"github.com/ninjadotorg/handshake-crowdfunding/bean"
 	"errors"
 	"mime/multipart"
 	"strings"
 	"time"
-	"github.com/autonomousdotai/handshake-crowdfunding/configs"
+	"github.com/ninjadotorg/handshake-crowdfunding/configs"
 	"log"
-	"github.com/autonomousdotai/handshake-crowdfunding/request_obj"
-	"github.com/autonomousdotai/handshake-crowdfunding/utils"
+	"github.com/ninjadotorg/handshake-crowdfunding/request_obj"
+	"github.com/ninjadotorg/handshake-crowdfunding/utils"
 	"github.com/jinzhu/gorm"
 	"github.com/gin-gonic/gin"
 	"strconv"

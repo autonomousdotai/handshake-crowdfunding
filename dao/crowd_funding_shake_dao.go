@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"github.com/autonomousdotai/handshake-crowdfunding/models"
+	"github.com/ninjadotorg/handshake-crowdfunding/models"
 	"log"
 	"github.com/jinzhu/gorm"
 	"time"

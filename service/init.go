@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/autonomousdotai/handshake-crowdfunding/dao"
-	"github.com/autonomousdotai/handshake-crowdfunding/utils"
+	"github.com/ninjadotorg/handshake-crowdfunding/dao"
+	"github.com/ninjadotorg/handshake-crowdfunding/utils"
 )
 
 var fileUploadService = utils.GSService{}

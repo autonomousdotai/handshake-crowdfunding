@@ -8,8 +8,8 @@ import (
 	"os"
 	"strconv"
 	"time"
-	"github.com/autonomousdotai/handshake-crowdfunding/api"
-	"github.com/autonomousdotai/handshake-crowdfunding/configs"
+	"github.com/ninjadotorg/handshake-crowdfunding/api"
+	"github.com/ninjadotorg/handshake-crowdfunding/configs"
 	"github.com/gin-gonic/gin"
 )
 
@@ -46,8 +46,10 @@ func main() {
 		})
 	})
 
-	api := api.Api{}
-	api.Init(router)
+	apiRouter := api.Api{}
+	apiRouter.Init(router)
+	faqRouter := api.FaqApi{}
+	faqRouter.Init(router)
 	router.Run(fmt.Sprintf(":%d", configs.ServicePort))
 }
 

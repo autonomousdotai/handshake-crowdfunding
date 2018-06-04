@@ -2,11 +2,11 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/autonomousdotai/handshake-crowdfunding/response_obj"
-	"github.com/autonomousdotai/handshake-crowdfunding/request_obj"
+	"github.com/ninjadotorg/handshake-crowdfunding/response_obj"
+	"github.com/ninjadotorg/handshake-crowdfunding/request_obj"
 	"net/http"
 	"strconv"
-	"github.com/autonomousdotai/handshake-crowdfunding/bean"
+	"github.com/ninjadotorg/handshake-crowdfunding/bean"
 	"log"
 	"encoding/json"
 )

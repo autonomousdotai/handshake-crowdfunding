@@ -1,6 +1,6 @@
 package response_obj
 
-import "github.com/autonomousdotai/handshake-crowdfunding/bean"
+import "github.com/ninjadotorg/handshake-crowdfunding/bean"
 
 type ResponseObject struct {
 	Status  int         `json:"status"`
