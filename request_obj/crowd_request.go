@@ -26,9 +26,3 @@ type CrowdFundingUpdateRequest struct {
 	ShortDescription string `json:"short_description"`
 	Description      string `json:"description"`
 }
-
-type CrowdFundingFaq struct {
-	Question       string`json:"question"`
-	Answer         string`json:"answer"`
-}
-

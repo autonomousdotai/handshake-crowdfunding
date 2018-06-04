@@ -337,3 +337,56 @@ func (crowdService CrowdService) MakeObjectToIndex(crowdFundingId int64) (error)
 	}
 	return nil
 }
+
+func (crowdService CrowdService) GetUser(userId int64) (models.User, error) {
+	result := models.JsonUserResponse{}
+	url := fmt.Sprintf("%s/%d", configs.DispatcherServiceUrl+"/system/user", userId)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Println(err)
+		return result.Data, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	bodyBytes, err := netUtil.CurlRequest(req)
+	if err != nil {
+		log.Println(err)
+		return result.Data, err
+	}
+	err = json.Unmarshal(bodyBytes, &result)
+	if err != nil {
+		log.Println(err)
+		return result.Data, err
+	}
+	return result.Data, err
+}
+
+func (crowdService CrowdService) CreateFaq(userId int64, crowdFundingId int64, crowdFundingFaqRequest request_obj.CrowdFundingFaqRequest) (models.CrowdFundingFaq, *bean.AppError) {
+	crowdFundingFaq := models.CrowdFundingFaq{}
+
+	crowdFundingFaq.UserId = userId
+	crowdFundingFaq.CrowdFundingId = crowdFundingId
+	crowdFundingFaq.Question = crowdFundingFaqRequest.Question
+	crowdFundingFaq.Answer = crowdFundingFaqRequest.Answer
+	crowdFundingFaq.Status = 1
+
+	crowdFundingFaq, err := crowdFundingFaqDao.Create(crowdFundingFaq, nil)
+	if err != nil {
+		log.Println(err)
+		return crowdFundingFaq, &bean.AppError{errors.New(err.Error()), "Error occurred, please try again", -1, "error_occurred"}
+	}
+
+	return crowdFundingFaq, nil
+}
+
+func (crowdService CrowdService) GetFaqsByCrowdId(crowdFundingId int64, pagination *bean.Pagination) (*bean.Pagination, error) {
+	pagination, err := crowdFundingFaqDao.GetAllBy(0, crowdFundingId, pagination)
+	faqs := pagination.Items.([]models.CrowdFundingFaq)
+	items := []models.CrowdFundingFaq{}
+	for _, faq := range faqs {
+		user, _ := crowdService.GetUser(faq.UserId)
+		faq.User = user
+		items = append(items, faq)
+	}
+	pagination.Items = items
+	return pagination, err
+}

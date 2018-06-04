@@ -7,14 +7,15 @@ import (
 )
 
 type CrowdFundingFaq struct {
-	ID             int
-	CrowdFundingId int
-	CrowdFunding   CrowdFunding
+	ID             int64
 	DateCreated    time.Time
 	DateModified   time.Time
+	UserId         int64
+	CrowdFundingId int64
 	Question       string
 	Answer         string
-	UserId         int
+	Status         int
+	User           User
 }
 
 func (CrowdFundingFaq) TableName() string {
