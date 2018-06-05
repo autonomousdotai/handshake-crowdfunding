@@ -379,6 +379,25 @@ func (crowdService CrowdService) CreateFaq(userId int64, crowdFundingId int64, c
 	return crowdFundingFaq, nil
 }
 
+func (crowdService CrowdService) UpdateFaq(userId int64, faqId int64, crowdFundingFaqRequest request_obj.CrowdFundingFaqRequest) (models.CrowdFundingFaq, *bean.AppError) {
+	crowdFundingFaq := crowdFundingFaqDao.GetById(faqId)
+
+	if crowdFundingFaq.ID <= 0 || crowdFundingFaq.UserId != userId {
+		return crowdFundingFaq, &bean.AppError{errors.New("faq_id is invalid"), "FaqId is invalid", -1, "error_occurred"}
+	}
+
+	crowdFundingFaq.Question = crowdFundingFaqRequest.Question
+	crowdFundingFaq.Answer = crowdFundingFaqRequest.Answer
+
+	crowdFundingFaq, err := crowdFundingFaqDao.Update(crowdFundingFaq, nil)
+	if err != nil {
+		log.Println(err)
+		return crowdFundingFaq, &bean.AppError{errors.New(err.Error()), "Error occurred, please try again", -1, "error_occurred"}
+	}
+
+	return crowdFundingFaq, nil
+}
+
 func (crowdService CrowdService) GetFaqsByCrowdId(crowdFundingId int64, pagination *bean.Pagination) (*bean.Pagination, error) {
 	pagination, err := crowdFundingFaqDao.GetAllBy(0, crowdFundingId, pagination)
 	faqs := pagination.Items.([]models.CrowdFundingFaq)

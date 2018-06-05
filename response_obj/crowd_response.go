@@ -4,6 +4,7 @@ import (
 	"time"
 	"github.com/ninjadotorg/handshake-crowdfunding/models"
 	"github.com/ninjadotorg/handshake-crowdfunding/utils"
+	"github.com/ninjadotorg/handshake-crowdfunding/bean"
 )
 
 type CrowdFundingResponse struct {
@@ -21,8 +22,8 @@ type CrowdFundingResponse struct {
 }
 
 type CrowdFundingImageResponse struct {
-	ID             int64                `json:"id"`
-	Image          string               `json:"image"`
+	ID    int64  `json:"id"`
+	Image string `json:"image"`
 }
 
 type CrowdFundingShakedResponse struct {
@@ -64,4 +65,60 @@ func MakeArrayCrowdFundingImageResponse(models []models.CrowdFundingImage) []Cro
 		results = append(results, result)
 	}
 	return results
+}
+
+type UserResponse struct {
+	ID     int64  `json:"id"`
+	Email  string `json:"email"`
+	Name   string `json:"name"`
+	Avatar string `json:"avatar"`
+	Status int    `json:"status"`
+}
+
+func MakeUserResponse(model models.User) UserResponse {
+	result := UserResponse{}
+	result.ID = model.ID
+	result.Email = model.Email
+	result.Name = model.Name
+	result.Avatar = utils.CdnUrlFor(model.Avatar)
+	return result
+}
+
+type CrowdFundingFaqResponse struct {
+	ID             int64        `json:"id"`
+	DateCreated    time.Time    `json:"date_created"`
+	DateModified   time.Time    `json:"date_modified"`
+	UserId         int64        `json:"user_id"`
+	CrowdFundingId int64        `json:"crowd_funding_id"`
+	Question       string       `json:"question"`
+	Answer         string       `json:"answer"`
+	Status         int          `json:"status"`
+	User           UserResponse `json:"user"`
+}
+
+func MakeCrowdFundingFaqResponse(model models.CrowdFundingFaq) CrowdFundingFaqResponse {
+	result := CrowdFundingFaqResponse{}
+	result.ID = model.ID
+	result.DateCreated = model.DateCreated
+	result.DateModified = model.DateModified
+	result.UserId = model.UserId
+	result.CrowdFundingId = model.CrowdFundingId
+	result.Question = model.Question
+	result.Answer = model.Answer
+	result.Status = model.Status
+	result.User = MakeUserResponse(model.User)
+	return result
+}
+
+func MakeArrayCrowdFundingFaqResponse(models []models.CrowdFundingFaq) []CrowdFundingFaqResponse {
+	results := []CrowdFundingFaqResponse{}
+	for _, model := range models {
+		result := MakeCrowdFundingFaqResponse(model)
+		results = append(results, result)
+	}
+	return results
+}
+
+func MakePaginationCommentResponse(pagination *bean.Pagination) PaginationResponse {
+	return MakePaginationResponse(pagination.Page, pagination.PageSize, pagination.Total, MakeArrayCrowdFundingFaqResponse(pagination.Items.([]models.CrowdFundingFaq)))
 }

@@ -11,7 +11,7 @@ import (
 type CrowdFundingFaqDao struct {
 }
 
-func (crowdFundingFaqDao CrowdFundingFaqDao) GetById(id int) (models.CrowdFundingFaq) {
+func (crowdFundingFaqDao CrowdFundingFaqDao) GetById(id int64) (models.CrowdFundingFaq) {
 	dto := models.CrowdFundingFaq{}
 	err := models.Database().Where("id = ?", id).First(&dto).Error
 	if err != nil {

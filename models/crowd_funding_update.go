@@ -16,6 +16,7 @@ type CrowdFundingUpdate struct {
 	Description      string
 	Title            string
 	UserId           int
+	User             User
 }
 
 func (CrowdFundingUpdate) TableName() string {
