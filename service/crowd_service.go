@@ -276,7 +276,7 @@ func (crowdService CrowdService) RefundCrowdFunding(userId int64, crowdFundingId
 	return nil
 }
 
-func (crowdService CrowdService) MakeObjectToIndex(crowdFundingId int64) (error) {
+func (crowdService CrowdService) IndexSolr(crowdFundingId int64) (error) {
 	crowdFunding := crowdFundingDao.GetFullById(crowdFundingId)
 
 	crowdFundingImages := crowdFundingImageDao.GetByCrowdId(crowdFunding.ID)
@@ -317,7 +317,8 @@ func (crowdService CrowdService) MakeObjectToIndex(crowdFundingId int64) (error)
 	if err != nil {
 		return err
 	}
-	req, err := http.NewRequest("POST", configs.SolrServiceUrl+"/handshake/update", bytes.NewBuffer(jsonStr))
+	url := fmt.Sprintf("%s/%s", configs.AppConf.SolrServiceUrl, "handshake/update")
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
 	if err != nil {
 		return err
 	}
@@ -340,7 +341,7 @@ func (crowdService CrowdService) MakeObjectToIndex(crowdFundingId int64) (error)
 
 func (crowdService CrowdService) GetUser(userId int64) (models.User, error) {
 	result := models.JsonUserResponse{}
-	url := fmt.Sprintf("%s/%d", configs.DispatcherServiceUrl+"/system/user", userId)
+	url := fmt.Sprintf("%s/%s/%d", configs.AppConf.DispatcherServiceUrl, "system/user", userId)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Println(err)

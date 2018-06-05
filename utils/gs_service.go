@@ -26,7 +26,7 @@ func (gsService GSService) UploadFile(file string, sourceFile *multipart.File) e
 	filePostBytes := bytes.NewReader(buffer)
 
 	var urlReq *url.URL
-	urlReq, err = url.Parse(configs.StorageServiceUrl)
+	urlReq, err = url.Parse(configs.AppConf.StorageServiceUrl)
 	if err != nil {
 		return err
 	}
