@@ -11,11 +11,16 @@ import (
 	"github.com/ninjadotorg/handshake-crowdfunding/api"
 	"github.com/ninjadotorg/handshake-crowdfunding/configs"
 	"github.com/gin-gonic/gin"
+	"google.golang.org/api/option"
+	"context"
+	"cloud.google.com/go/pubsub"
 )
 
 func main() {
 
 	configs.Initialize(os.Getenv("APP_CONF"))
+
+	go NewProcesser()
 
 	// Logger
 	logFile, err := os.OpenFile("logs/autonomous_service.log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
@@ -52,7 +57,7 @@ func main() {
 	apiRouter.Init(router)
 	faqRouter := api.FaqApi{}
 	faqRouter.Init(router)
-	router.Run(fmt.Sprintf(":%d", configs.ServicePort))
+	router.Run(fmt.Sprintf(":%d", configs.AppConf.ServicePort))
 }
 
 func Logger() gin.HandlerFunc {
@@ -72,4 +77,15 @@ func AuthorizeMiddleware() gin.HandlerFunc {
 		context.Set("UserId", userId)
 		context.Next()
 	}
+}
+
+func NewProcesser() (error) {
+	opt := option.WithCredentialsFile(configs.AppConf.PubsubConf.CredsFile)
+	pubsubClient1, err := pubsub.NewClient(context.Background(), configs.AppConf.PubsubConf.ProjectId, opt)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	api.NewEthHandler(pubsubClient1, configs.AppConf.PubsubConf.Topic, configs.AppConf.PubsubConf.Subscription)
+	return nil
 }

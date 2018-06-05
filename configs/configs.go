@@ -19,9 +19,10 @@ type AppConfig struct {
 }
 
 type PubsubConf struct {
-	CredsFile string `json:"creds_file"`
-	ProjectId string `json:"project_id"`
-	SubName   string `json:"sub_name"`
+	CredsFile    string `json:"creds_file"`
+	ProjectId    string `json:"project_id"`
+	Topic        string `json:"topic"`
+	Subscription string `json:"subscription"`
 }
 
 func Initialize(confFile string) {

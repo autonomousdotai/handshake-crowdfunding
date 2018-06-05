@@ -7,33 +7,43 @@ import (
 )
 
 type EtherHandler struct {
-	Client *pubsub.Client
-	Topic  *pubsub.Topic
+	BubsubClient       *pubsub.Client
+	BubsubSubscription *pubsub.Subscription
 }
 
-func NewEthHandler(pubsubClient *pubsub.Client, subName string) (*EtherHandler, error) {
+func NewEthHandler(pubsubClient *pubsub.Client, topicName, subscriptionName string) (*EtherHandler, error) {
 	handler := EtherHandler{}
 
-	handler.Client = pubsubClient
+	handler.BubsubClient = pubsubClient
 
-	topic := pubsubClient.Topic(subName)
-	if topic == nil || topic.ID() != subName {
-		topic, err := pubsubClient.CreateTopic(context.Background(), subName)
+	topic := pubsubClient.Topic(topicName)
+	if topic == nil || topic.ID() != topicName {
+		var err error
+		topic, err = pubsubClient.CreateTopic(context.Background(), topicName)
 		if err != nil {
 			log.Println("NewEthHandler", err)
 			return nil, err
-		} else {
-			handler.Topic = topic
 		}
-	} else {
-		handler.Topic = topic
 	}
 
-	sub, err := pubsubClient.CreateSubscription(context.Background(), subName, pubsub.SubscriptionConfig{Topic: topic})
-
+	sub := pubsubClient.Subscription(subscriptionName)
+	existed, err := sub.Exists(context.Background())
+	if err != nil {
+		log.Println("NewEthHandler", err)
+		return nil, err
+	}
+	if !existed {
+		var err error
+		sub, err = pubsubClient.CreateSubscription(context.Background(), subscriptionName, pubsub.SubscriptionConfig{Topic: topic})
+		if err != nil {
+			log.Println("NewEthHandler", err)
+			return nil, err
+		}
+	}
 	err = sub.Receive(context.Background(), func(ctx context.Context, m *pubsub.Message) {
-		log.Printf("Got message: %s", m.Data)
+		log.Printf("Got message : %s", m.Data)
 		m.Ack()
+		handler.Process(string(m.Data))
 	})
 	if err != nil {
 		log.Println("NewEthHandler", err)
@@ -43,7 +53,7 @@ func NewEthHandler(pubsubClient *pubsub.Client, subName string) (*EtherHandler, 
 	return &handler, nil
 }
 
-func (etherHandler *EtherHandler) Process() (error) {
+func (etherHandler *EtherHandler) Process(message string) (error) {
 
 	return nil
 }
