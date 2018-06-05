@@ -11,26 +11,29 @@ import (
 	"encoding/json"
 )
 
-type Api struct {
+type CrowdApi struct {
 }
 
-func (api Api) Init(router *gin.Engine) *gin.Engine {
-	router.POST("/", func(context *gin.Context) {
-		api.CreateCrowdFunding(context)
-	})
-	router.PUT("/", func(context *gin.Context) {
-		api.UpdateCrowdFunding(context)
-	})
-	router.GET("/:crowd_funding_id", func(context *gin.Context) {
-		api.GetCrowdFunding(context)
-	})
-	router.POST("/shake/:crowd_funding_id", func(context *gin.Context) {
-		api.UserShake(context)
-	})
-	return router
+func (crowdApi CrowdApi) Init(router *gin.Engine) *gin.RouterGroup {
+	crowdGroup := router.Group("/crowd")
+	{
+		crowdGroup.POST("/", func(context *gin.Context) {
+			crowdApi.CreateCrowdFunding(context)
+		})
+		crowdGroup.PUT("/", func(context *gin.Context) {
+			crowdApi.UpdateCrowdFunding(context)
+		})
+		crowdGroup.GET("/:crowd_funding_id", func(context *gin.Context) {
+			crowdApi.GetCrowdFunding(context)
+		})
+		crowdGroup.POST("/shake/:crowd_funding_id", func(context *gin.Context) {
+			crowdApi.UserShake(context)
+		})
+	}
+	return crowdGroup
 }
 
-func (self Api) CreateCrowdFunding(context *gin.Context) {
+func (self CrowdApi) CreateCrowdFunding(context *gin.Context) {
 	result := new(response_obj.ResponseObject)
 
 	userId, ok := context.Get("UserId")
@@ -72,7 +75,7 @@ func (self Api) CreateCrowdFunding(context *gin.Context) {
 	return
 }
 
-func (self Api) UpdateCrowdFunding(context *gin.Context) {
+func (self CrowdApi) UpdateCrowdFunding(context *gin.Context) {
 	result := new(response_obj.ResponseObject)
 
 	userId, ok := context.Get("UserId")
@@ -126,7 +129,7 @@ func (self Api) UpdateCrowdFunding(context *gin.Context) {
 	return
 }
 
-func (self Api) GetCrowdFunding(context *gin.Context) {
+func (self CrowdApi) GetCrowdFunding(context *gin.Context) {
 	result := new(response_obj.ResponseObject)
 
 	crowdFungingId, err := strconv.ParseInt(context.Param("crowd_funding_id"), 10, 64)
@@ -158,7 +161,7 @@ func (self Api) GetCrowdFunding(context *gin.Context) {
 	return
 }
 
-func (self Api) UserShake(context *gin.Context) {
+func (self CrowdApi) UserShake(context *gin.Context) {
 	result := new(response_obj.ResponseObject)
 
 	userId, ok := context.Get("UserId")

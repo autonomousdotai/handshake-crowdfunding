@@ -15,6 +15,8 @@ import (
 
 func main() {
 
+	configs.Initialize(os.Getenv("APP_CONF"))
+
 	// Logger
 	logFile, err := os.OpenFile("logs/autonomous_service.log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
@@ -46,7 +48,7 @@ func main() {
 		})
 	})
 
-	apiRouter := api.Api{}
+	apiRouter := api.CrowdApi{}
 	apiRouter.Init(router)
 	faqRouter := api.FaqApi{}
 	faqRouter.Init(router)
