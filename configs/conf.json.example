@@ -8,6 +8,7 @@
   "pubsub_conf": {
     "creds_file": "",
     "project_id": "",
-    "sub_name": ""
+    "topic": "",
+    "subscription": ""
   }
 }
