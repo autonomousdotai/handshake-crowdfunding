@@ -11,6 +11,7 @@ type CrowdFunding struct {
 	DateCreated        time.Time
 	DateModified       time.Time
 	ID                 int64
+	ChainId            int64
 	Hid                int64
 	UserId             int64
 	Name               string
