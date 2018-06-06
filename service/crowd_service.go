@@ -25,7 +25,7 @@ import (
 type CrowdService struct {
 }
 
-func (crowdService CrowdService) CreateTx(userId int64, address string, hash string, refType string, refId int64, tx *gorm.DB) (models.EthTx, *bean.AppError) {
+func (crowdService CrowdService) CreateTx(userId int64, address string, hash string, refType string, refId int64, tx *gorm.DB) (models.EthTx, error) {
 	ethTx := models.EthTx{}
 	ethTx.UserId = userId
 	ethTx.FromAddress = address
@@ -36,12 +36,12 @@ func (crowdService CrowdService) CreateTx(userId int64, address string, hash str
 	ethTx, err := ethTxDao.Create(ethTx, tx)
 	if err != nil {
 		log.Println(err)
-		return ethTx, &bean.AppError{errors.New(err.Error()), "Error occurred, please try again", -1, "error_occurred"}
+		return ethTx, err
 	}
 	return ethTx, nil
 }
 
-func (crowdService CrowdService) CreateCrowdFunding(userId int64, request request_obj.CrowdFundingRequest, context *gin.Context) (models.CrowdFunding, *bean.AppError) {
+func (crowdService CrowdService) CreateCrowdFunding(userId int64, request request_obj.CrowdFundingRequest, context *gin.Context) (models.CrowdFunding, error) {
 	crowdFunding := models.CrowdFunding{}
 
 	tx := models.Database().Begin()
@@ -61,7 +61,7 @@ func (crowdService CrowdService) CreateCrowdFunding(userId int64, request reques
 		log.Println(err)
 		//rollback
 		tx.Rollback()
-		return crowdFunding, &bean.AppError{errors.New(err.Error()), "Error occurred, please try again", -1, "error_occurred"}
+		return crowdFunding, err
 	}
 
 	imageLength, err := strconv.Atoi(context.Request.PostFormValue("image_length"))
@@ -71,7 +71,7 @@ func (crowdService CrowdService) CreateCrowdFunding(userId int64, request reques
 			log.Println(err)
 			//rollback
 			tx.Rollback()
-			return crowdFunding, &bean.AppError{errors.New(err.Error()), "Error occurred, please try again", -1, "error_occurred"}
+			return crowdFunding, err
 		}
 		filePath := ""
 		if imageFile != nil && imageFileHeader != nil {
@@ -85,7 +85,7 @@ func (crowdService CrowdService) CreateCrowdFunding(userId int64, request reques
 				log.Println(err)
 				//rollback
 				tx.Rollback()
-				return crowdFunding, &bean.AppError{errors.New(err.Error()), "Error occurred, please try again", -1, "error_occurred"}
+				return crowdFunding, err
 			}
 		}
 		crowdFundingImage := models.CrowdFundingImage{}
@@ -98,7 +98,7 @@ func (crowdService CrowdService) CreateCrowdFunding(userId int64, request reques
 			log.Println(err)
 			//rollback
 			tx.Rollback()
-			return crowdFunding, &bean.AppError{errors.New(err.Error()), "Error occurred, please try again", -1, "error_occurred"}
+			return crowdFunding, err
 		}
 	}
 
@@ -109,10 +109,10 @@ func (crowdService CrowdService) CreateCrowdFunding(userId int64, request reques
 	return crowdFunding, nil
 }
 
-func (crowdService CrowdService) UpdateCrowdFunding(userId int64, crowdFundingId int64, request request_obj.CrowdFundingRequest, imageFile *multipart.File, imageFileHeader *multipart.FileHeader) (models.CrowdFunding, *bean.AppError) {
+func (crowdService CrowdService) UpdateCrowdFunding(userId int64, crowdFundingId int64, request request_obj.CrowdFundingRequest, imageFile *multipart.File, imageFileHeader *multipart.FileHeader) (models.CrowdFunding, error) {
 	crowdFunding := crowdFundingDao.GetById(crowdFundingId)
 	if crowdFunding.ID <= 0 || crowdFunding.UserId != userId {
-		return crowdFunding, &bean.AppError{errors.New("crowdFundingId is invalid"), "crowdFundingId is invalid", -1, "error_occurred"}
+		return crowdFunding, errors.New("crowdFundingId is invalid")
 	}
 
 	crowdFunding.Name = request.Name
@@ -129,29 +129,29 @@ func (crowdService CrowdService) UpdateCrowdFunding(userId int64, crowdFundingId
 	crowdFunding, err := crowdFundingDao.Update(crowdFunding, nil)
 	if err != nil {
 		log.Println(err)
-		return crowdFunding, &bean.AppError{errors.New(err.Error()), "Error occurred, please try again", -1, "error_occurred"}
+		return crowdFunding, err
 	}
 	return crowdFunding, nil
 }
 
-func (crowdService CrowdService) GetCrowdFunding(userId int64, crowdFundingId int64) (models.CrowdFunding, *bean.AppError) {
+func (crowdService CrowdService) GetCrowdFunding(userId int64, crowdFundingId int64) (models.CrowdFunding, error) {
 	crowdFunding := crowdFundingDao.GetById(crowdFundingId)
 	if crowdFunding.ID <= 0 {
-		return crowdFunding, &bean.AppError{errors.New("crowdFundingId is invalid"), "crowdFundingId is invalid", -1, "error_occurred"}
+		return crowdFunding, errors.New("crowdFundingId is invalid")
 	}
 	return crowdFunding, nil
 }
 
-func (crowdService CrowdService) UserShake(userId int64, crowdFundingId int64, quantity int, address string, hash string) (models.CrowdFundingShake, *bean.AppError) {
+func (crowdService CrowdService) UserShake(userId int64, crowdFundingId int64, quantity int, address string, hash string) (models.CrowdFundingShake, error) {
 	crowdFundingShake := models.CrowdFundingShake{}
 
 	if quantity <= 0 {
-		return crowdFundingShake, &bean.AppError{errors.New("quantity is invalid"), "quantity is invalid", -1, "error_occurred"}
+		return crowdFundingShake, errors.New("quantity is invalid")
 	}
 
 	crowdFunding := crowdFundingDao.GetFullById(crowdFundingId)
 	if crowdFunding.ID <= 0 {
-		return crowdFundingShake, &bean.AppError{errors.New("crowdFundingId is invalid"), "crowdFundingId is invalid", -1, "error_occurred"}
+		return crowdFundingShake, errors.New("crowdFundingId is invalid")
 	}
 
 	crowdFundingShake.UserId = userId
@@ -163,53 +163,40 @@ func (crowdService CrowdService) UserShake(userId int64, crowdFundingId int64, q
 	crowdFundingShake, err := crowdFundingShakeDao.Create(crowdFundingShake, nil)
 	if err != nil {
 		log.Println(err)
-		return crowdFundingShake, &bean.AppError{errors.New(err.Error()), "Error occurred, please try again", -1, "error_occurred"}
+		return crowdFundingShake, err
 	}
 
-	_, appErr := crowdService.CreateTx(userId, address, hash, "crowd_shake", crowdFundingShake.ID, nil)
-	if appErr != nil {
-		log.Println(appErr.OrgError)
-		return crowdFundingShake, appErr
+	_, err = crowdService.CreateTx(userId, address, hash, "crowd_shake", crowdFundingShake.ID, nil)
+	if err != nil {
+		log.Println(err)
+		return crowdFundingShake, err
 	}
 
 	return crowdFundingShake, nil
 }
 
-func (crowdService CrowdService) UnshakeCrowdFunding(userId int64, crowdFundingId int64, address string, hash string) (*bean.AppError) {
+func (crowdService CrowdService) UnshakeCrowdFunding(userId int64, crowdFundingId int64) (error) {
 	crowdFunding := crowdFundingDao.GetFullByUser(userId, crowdFundingId)
 	if crowdFunding.ID <= 0 {
-		return &bean.AppError{errors.New("crowdFundingId is invalid"), "crowdFundingId is invalid", -1, "error_occurred"}
+		return errors.New("crowdFundingId is invalid")
 	}
 	crowdFundingShaked := crowdFunding.CrowdFundingShake
 
 	if crowdFundingShaked.ID <= 0 || crowdFundingShaked.Status <= 0 {
-		return &bean.AppError{errors.New("crowdFunding is not shaked"), "crowdFunding is not shaked", -1, "error_occurred"}
-	}
-
-	tx := models.Database().Begin()
-
-	_, appErr := crowdService.CreateTx(userId, address, hash, "crowd_unshake", userId, tx)
-	if appErr != nil {
-		log.Println(appErr.OrgError)
-
-		tx.Rollback()
-		return appErr
+		return errors.New("crowdFundingId is invalid")
 	}
 
 	crowdFundingShaked.Status = utils.CROWD_ORDER_STATUS_UNSHAKED_PROCESS
-	crowdFundingShaked, err := crowdFundingShakeDao.Update(crowdFundingShaked, tx)
+	crowdFundingShaked, err := crowdFundingShakeDao.Update(crowdFundingShaked, nil)
 	if err != nil {
 		log.Println(err)
-
-		tx.Rollback()
-		return &bean.AppError{errors.New(err.Error()), "Error occurred, please try again", -1, "error_occurred"}
+		return err
 	}
 
-	tx.Commit()
 	return nil
 }
 
-func (crowdService CrowdService) CancelCrowdFunding(userId int64, crowdFundingId int64, address string, hash string) (*bean.AppError) {
+func (crowdService CrowdService) CancelCrowdFunding(userId int64, crowdFundingId int64) (error) {
 	crowdFunding := crowdFundingDao.GetFullByUser(userId, crowdFundingId)
 	if crowdFunding.ID <= 0 {
 		return &bean.AppError{errors.New("crowdFundingId is invalid"), "crowdFundingId is invalid", -1, "error_occurred"}
@@ -218,32 +205,19 @@ func (crowdService CrowdService) CancelCrowdFunding(userId int64, crowdFundingId
 
 	if crowdFundingShaked.ID <= 0 || crowdFundingShaked.Status <= 0 {
 		return &bean.AppError{errors.New("crowdFunding is not shaked"), "crowdFunding is not shaked", -1, "error_occurred"}
-	}
-
-	tx := models.Database().Begin()
-
-	_, appErr := crowdService.CreateTx(userId, address, hash, "crowd_cancel", userId, tx)
-	if appErr != nil {
-		log.Println(appErr.OrgError)
-
-		tx.Rollback()
-		return appErr
 	}
 
 	crowdFundingShaked.Status = utils.CROWD_ORDER_STATUS_CANCELED_PROCESS
-	crowdFundingShaked, err := crowdFundingShakeDao.Update(crowdFundingShaked, tx)
+	crowdFundingShaked, err := crowdFundingShakeDao.Update(crowdFundingShaked, nil)
 	if err != nil {
 		log.Println(err)
-
-		tx.Rollback()
-		return &bean.AppError{errors.New(err.Error()), "Error occurred, please try again", -1, "error_occurred"}
+		return err
 	}
 
-	tx.Commit()
 	return nil
 }
 
-func (crowdService CrowdService) RefundCrowdFunding(userId int64, crowdFundingId int64, address string, hash string) (*bean.AppError) {
+func (crowdService CrowdService) RefundCrowdFunding(userId int64, crowdFundingId int64) (error) {
 	crowdFunding := crowdFundingDao.GetFullByUser(userId, crowdFundingId)
 	if crowdFunding.ID <= 0 {
 		return &bean.AppError{errors.New("crowdFundingId is invalid"), "crowdFundingId is invalid", -1, "error_occurred"}
@@ -254,26 +228,14 @@ func (crowdService CrowdService) RefundCrowdFunding(userId int64, crowdFundingId
 		return &bean.AppError{errors.New("crowdFunding is not shaked"), "crowdFunding is not shaked", -1, "error_occurred"}
 	}
 
-	tx := models.Database().Begin()
-
-	_, appErr := crowdService.CreateTx(userId, address, hash, "crowd_refund", userId, tx)
-	if appErr != nil {
-		log.Println(appErr.OrgError)
-
-		tx.Rollback()
-		return appErr
-	}
-
 	crowdFundingShaked.Status = utils.CROWD_ORDER_STATUS_REFUNDED_PROCESS
-	crowdFundingShaked, err := crowdFundingShakeDao.Update(crowdFundingShaked, tx)
+	crowdFundingShaked, err := crowdFundingShakeDao.Update(crowdFundingShaked, nil)
 	if err != nil {
 		log.Println(err)
 
-		tx.Rollback()
-		return &bean.AppError{errors.New(err.Error()), "Error occurred, please try again", -1, "error_occurred"}
+		return err
 	}
 
-	tx.Commit()
 	return nil
 }
 
@@ -362,7 +324,7 @@ func (crowdService CrowdService) GetUser(userId int64) (models.User, error) {
 	return result.Data, err
 }
 
-func (crowdService CrowdService) CreateFaq(userId int64, crowdFundingId int64, crowdFundingFaqRequest request_obj.CrowdFundingFaqRequest) (models.CrowdFundingFaq, *bean.AppError) {
+func (crowdService CrowdService) CreateFaq(userId int64, crowdFundingId int64, crowdFundingFaqRequest request_obj.CrowdFundingFaqRequest) (models.CrowdFundingFaq, error) {
 	crowdFundingFaq := models.CrowdFundingFaq{}
 
 	crowdFundingFaq.UserId = userId
@@ -374,17 +336,17 @@ func (crowdService CrowdService) CreateFaq(userId int64, crowdFundingId int64, c
 	crowdFundingFaq, err := crowdFundingFaqDao.Create(crowdFundingFaq, nil)
 	if err != nil {
 		log.Println(err)
-		return crowdFundingFaq, &bean.AppError{errors.New(err.Error()), "Error occurred, please try again", -1, "error_occurred"}
+		return crowdFundingFaq, err
 	}
 
 	return crowdFundingFaq, nil
 }
 
-func (crowdService CrowdService) UpdateFaq(userId int64, faqId int64, crowdFundingFaqRequest request_obj.CrowdFundingFaqRequest) (models.CrowdFundingFaq, *bean.AppError) {
+func (crowdService CrowdService) UpdateFaq(userId int64, faqId int64, crowdFundingFaqRequest request_obj.CrowdFundingFaqRequest) (models.CrowdFundingFaq, error) {
 	crowdFundingFaq := crowdFundingFaqDao.GetById(faqId)
 
 	if crowdFundingFaq.ID <= 0 || crowdFundingFaq.UserId != userId {
-		return crowdFundingFaq, &bean.AppError{errors.New("faq_id is invalid"), "FaqId is invalid", -1, "error_occurred"}
+		return crowdFundingFaq, errors.New("faq_id is invalid")
 	}
 
 	crowdFundingFaq.Question = crowdFundingFaqRequest.Question
@@ -393,7 +355,7 @@ func (crowdService CrowdService) UpdateFaq(userId int64, faqId int64, crowdFundi
 	crowdFundingFaq, err := crowdFundingFaqDao.Update(crowdFundingFaq, nil)
 	if err != nil {
 		log.Println(err)
-		return crowdFundingFaq, &bean.AppError{errors.New(err.Error()), "Error occurred, please try again", -1, "error_occurred"}
+		return crowdFundingFaq, err
 	}
 
 	return crowdFundingFaq, nil

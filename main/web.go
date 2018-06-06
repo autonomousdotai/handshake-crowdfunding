@@ -81,11 +81,11 @@ func AuthorizeMiddleware() gin.HandlerFunc {
 
 func NewProcesser() (error) {
 	opt := option.WithCredentialsFile(configs.AppConf.PubsubConf.CredsFile)
-	pubsubClient1, err := pubsub.NewClient(context.Background(), configs.AppConf.PubsubConf.ProjectId, opt)
+	pubsubClient, err := pubsub.NewClient(context.Background(), configs.AppConf.PubsubConf.ProjectId, opt)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
-	api.NewEthHandler(pubsubClient1, configs.AppConf.PubsubConf.Topic, configs.AppConf.PubsubConf.Subscription)
+	api.NewEthHandler(pubsubClient, configs.AppConf.PubsubConf.Topic, configs.AppConf.PubsubConf.Subscription)
 	return nil
 }
