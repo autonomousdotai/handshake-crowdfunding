@@ -410,3 +410,47 @@ func (crowdService CrowdService) GetFaqsByCrowdId(crowdFundingId int64, paginati
 	pagination.Items = items
 	return pagination, err
 }
+
+func (crowdService CrowdService) ProcessEventInit(hid int64, crowdFungdingId int64) (error) {
+	crowdFunding := crowdFundingDao.GetById(crowdFungdingId)
+
+	crowdFunding.Hid = hid
+	crowdFunding.Status = utils.CROWD_STATUS_APPROVED
+
+	crowdFunding, err := crowdFundingDao.Update(crowdFunding, nil)
+	if err != nil {
+		log.Println(err)
+	}
+
+	return nil
+}
+
+func (crowdService CrowdService) ProcessEventShake(hid int64, state int, balance float64, crowdFundingShakeId int64) (error) {
+
+	return nil
+}
+
+func (crowdService CrowdService) ProcessEventUnShake(hid int64, state int, balance float64, crowdFundingShakeId int64) (error) {
+
+	return nil
+}
+
+func (crowdService CrowdService) ProcessEventCancel(hid int64, state int, userId int64) (error) {
+
+	return nil
+}
+
+func (crowdService CrowdService) ProcessEventRefund(hid int64, state int, userId int64) (error) {
+
+	return nil
+}
+
+func (crowdService CrowdService) ProcessEventStop(hid int64, state int, crowdFungdingId int64) (error) {
+
+	return nil
+}
+
+func (crowdService CrowdService) ProcessEventWithdraw(hid int64, amount float64, userId int64) (error) {
+
+	return nil
+}

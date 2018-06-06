@@ -1,5 +1,10 @@
 package utils
 
+import (
+	"strings"
+	"errors"
+)
+
 var DEFAULT_PAGE_SIZE = 20
 var DEFAULT_PAGE = 1
 
@@ -31,3 +36,15 @@ var CROWD_ORDER_STATUS_CANCELED_FAILED = 23
 var CROWD_ORDER_STATUS_REFUNDED = 4
 var CROWD_ORDER_STATUS_REFUNDED_PROCESS = 14
 var CROWD_ORDER_STATUS_REFUNDED_FAILED = 24
+
+var OFFCHAIN_CROWD = "cf"
+var OFFCHAIN_CROWD_SHAKE = "cfs"
+var OFFCHAIN_USER = "usr"
+
+func ParseOffchain(offchain string) (string, string, error) {
+	offchains := strings.Split(offchain, "_")
+	if len(offchains) >= 2 {
+		return strings.Trim(offchains[0], " "), strings.Trim(offchains[1], " "), nil
+	}
+	return "", "", errors.New("offchain is invalid")
+}

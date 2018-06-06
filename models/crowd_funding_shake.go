@@ -17,6 +17,7 @@ type CrowdFundingShake struct {
 	Quantity       int
 	Amount         float64
 	Status         int
+	Address        string
 }
 
 func (CrowdFundingShake) TableName() string {
