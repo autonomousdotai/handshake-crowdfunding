@@ -11,7 +11,6 @@ import (
 	"log"
 	"github.com/ninjadotorg/handshake-crowdfunding/request_obj"
 	"github.com/ninjadotorg/handshake-crowdfunding/utils"
-	"github.com/jinzhu/gorm"
 	"github.com/gin-gonic/gin"
 	"strconv"
 	"fmt"
@@ -23,22 +22,6 @@ import (
 )
 
 type CrowdService struct {
-}
-
-func (crowdService CrowdService) CreateTx(userId int64, address string, hash string, refType string, refId int64, tx *gorm.DB) (models.EthTx, error) {
-	ethTx := models.EthTx{}
-	ethTx.UserId = userId
-	ethTx.FromAddress = address
-	ethTx.Hash = hash
-	ethTx.RefType = refType
-	ethTx.RefId = refId
-	ethTx.Status = 0
-	ethTx, err := ethTxDao.Create(ethTx, tx)
-	if err != nil {
-		log.Println(err)
-		return ethTx, err
-	}
-	return ethTx, nil
 }
 
 func (crowdService CrowdService) CreateCrowdFunding(userId int64, request request_obj.CrowdFundingRequest, context *gin.Context) (models.CrowdFunding, error) {
@@ -161,12 +144,6 @@ func (crowdService CrowdService) UserShake(userId int64, crowdFundingId int64, q
 	crowdFundingShake.Status = utils.CROWD_ORDER_STATUS_NEW
 
 	crowdFundingShake, err := crowdFundingShakeDao.Create(crowdFundingShake, nil)
-	if err != nil {
-		log.Println(err)
-		return crowdFundingShake, err
-	}
-
-	_, err = crowdService.CreateTx(userId, address, hash, "crowd_shake", crowdFundingShake.ID, nil)
 	if err != nil {
 		log.Println(err)
 		return crowdFundingShake, err

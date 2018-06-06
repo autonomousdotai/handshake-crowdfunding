@@ -13,7 +13,6 @@ var (
 	crowdFundingShakeDao  = dao.CrowdFundingShakeDao{}
 	crowdFundingFaqDao    = dao.CrowdFundingFaqDao{}
 	crowdFundingUpdateDao = dao.CrowdFundingUpdateDao{}
-	ethTxDao              = dao.EthTxDao{}
 	// template
 	netUtil = utils.NetUtil{}
 )
