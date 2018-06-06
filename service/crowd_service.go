@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"github.com/rtt/Go-Solr"
+	"math"
 )
 
 type CrowdService struct {
@@ -413,6 +414,9 @@ func (crowdService CrowdService) GetFaqsByCrowdId(crowdFundingId int64, paginati
 
 func (crowdService CrowdService) ProcessEventInit(hid int64, crowdFungdingId int64) (error) {
 	crowdFunding := crowdFundingDao.GetById(crowdFungdingId)
+	if crowdFunding.ID <= 0 {
+		return errors.New("crowdFunding is invalid")
+	}
 
 	crowdFunding.Hid = hid
 	crowdFunding.Status = utils.CROWD_STATUS_APPROVED
@@ -420,37 +424,163 @@ func (crowdService CrowdService) ProcessEventInit(hid int64, crowdFungdingId int
 	crowdFunding, err := crowdFundingDao.Update(crowdFunding, nil)
 	if err != nil {
 		log.Println(err)
+		return err
 	}
 
 	return nil
 }
 
-func (crowdService CrowdService) ProcessEventShake(hid int64, state int, balance float64, crowdFundingShakeId int64) (error) {
+func (crowdService CrowdService) ProcessEventShake(hid int64, state int, balance float64, crowdFundingShakeId int64, fromAddress string) (error) {
+	crowdFundingShake := crowdFundingShakeDao.GetById(crowdFundingShakeId)
+	if crowdFundingShake.ID < 0 {
+		return errors.New("crowdFundingShake is invalid")
+	}
+	tx := models.Database().Begin()
+	//for check shaked before
+	crowdFundingShakes := crowdFundingShakeDao.GetAllByBackerStatus(crowdFundingShake.CrowdFundingId, crowdFundingShake.UserId, utils.CROWD_ORDER_STATUS_SHAKED)
 
+	crowdFundingShake.Address = fromAddress
+	crowdFundingShake.Status = utils.CROWD_ORDER_STATUS_SHAKED
+
+	crowdFundingShake, err := crowdFundingShakeDao.Update(crowdFundingShake, tx)
+	if err != nil {
+		log.Println(err)
+		tx.Rollback()
+		return err
+	}
+
+	crowdFunding := crowdFundingDao.GetByHId(hid)
+	if crowdFunding.ID <= 0 {
+		return errors.New("crowdFunding is invalid")
+	}
+
+	crowdFunding.Balance = balance / math.Pow(10, 18)
+	if len(crowdFundingShakes) == 0 {
+		crowdFunding.ShakeNum += 1
+	}
+
+	if state == 1 && crowdFunding.Status == utils.CROWD_STATUS_FAILED && crowdFunding.CrowdDate.Before(time.Now()) {
+		crowdFunding.Status = utils.CROWD_STATUS_FUNDED
+	}
+
+	crowdFunding, err = crowdFundingDao.Update(crowdFunding, tx)
+	if err != nil {
+		log.Println(err)
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
 	return nil
 }
 
-func (crowdService CrowdService) ProcessEventUnShake(hid int64, state int, balance float64, crowdFundingShakeId int64) (error) {
+func (crowdService CrowdService) ProcessEventUnShake(hid int64, state int, balance float64, userId int64) (error) {
+	tx := models.Database().Begin()
 
+	crowdFunding := crowdFundingDao.GetByHId(hid)
+	if crowdFunding.ID <= 0 {
+		return errors.New("crowdFunding is invalid")
+	}
+
+	crowdFundingShakes := crowdFundingShakeDao.GetAllByBackerStatus(crowdFunding.ID, userId, utils.CROWD_ORDER_STATUS_UNSHAKED_PROCESS)
+	for _, crowdFundingShake := range crowdFundingShakes {
+		crowdFundingShake.Status = utils.CROWD_ORDER_STATUS_UNSHAKED
+		_, err := crowdFundingShakeDao.Update(crowdFundingShake, tx)
+		if err != nil {
+			log.Println(err)
+			tx.Rollback()
+			return err
+		}
+	}
+
+	crowdFunding.Balance = balance / math.Pow(10, 18)
+	crowdFunding.ShakeNum -= 1
+
+	crowdFunding, err := crowdFundingDao.Update(crowdFunding, tx)
+	if err != nil {
+		log.Println(err)
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
 	return nil
 }
 
 func (crowdService CrowdService) ProcessEventCancel(hid int64, state int, userId int64) (error) {
+	tx := models.Database().Begin()
 
+	crowdFunding := crowdFundingDao.GetByHId(hid)
+	if crowdFunding.ID <= 0 {
+		return errors.New("crowdFunding is invalid")
+	}
+
+	crowdFundingShakes := crowdFundingShakeDao.GetAllByBackerStatus(crowdFunding.ID, userId, utils.CROWD_ORDER_STATUS_CANCELED_PROCESS)
+	for _, crowdFundingShake := range crowdFundingShakes {
+		crowdFundingShake.Status = utils.CROWD_ORDER_STATUS_CANCELED
+		_, err := crowdFundingShakeDao.Update(crowdFundingShake, tx)
+		if err != nil {
+			log.Println(err)
+			tx.Rollback()
+			return err
+		}
+	}
+
+	if state == 2 {
+		crowdFunding.Status = utils.CROWD_STATUS_CANCELED
+		_, err := crowdFundingDao.Update(crowdFunding, tx)
+		if err != nil {
+			log.Println(err)
+			tx.Rollback()
+			return err
+		}
+	}
+
+	tx.Commit()
 	return nil
 }
 
 func (crowdService CrowdService) ProcessEventRefund(hid int64, state int, userId int64) (error) {
+	tx := models.Database().Begin()
 
+	crowdFunding := crowdFundingDao.GetByHId(hid)
+	if crowdFunding.ID <= 0 {
+		return errors.New("crowdFunding is invalid")
+	}
+
+	crowdFundingShakes := crowdFundingShakeDao.GetAllByBackerStatus(crowdFunding.ID, userId, utils.CROWD_ORDER_STATUS_REFUNDED_PROCESS)
+	for _, crowdFundingShake := range crowdFundingShakes {
+		crowdFundingShake.Status = utils.CROWD_ORDER_STATUS_REFUNDED
+		_, err := crowdFundingShakeDao.Update(crowdFundingShake, tx)
+		if err != nil {
+			log.Println(err)
+			tx.Rollback()
+			return err
+		}
+	}
+
+	tx.Commit()
 	return nil
 }
 
 func (crowdService CrowdService) ProcessEventStop(hid int64, state int, crowdFungdingId int64) (error) {
+	crowdFunding := crowdFundingDao.GetById(crowdFungdingId)
+	if crowdFunding.ID <= 0 {
+		return errors.New("crowdFunding is invalid")
+	}
+
+	crowdFunding.Status = utils.CROWD_STATUS_CANCELED
+
+	crowdFunding, err := crowdFundingDao.Update(crowdFunding, nil)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 
 	return nil
 }
 
 func (crowdService CrowdService) ProcessEventWithdraw(hid int64, amount float64, userId int64) (error) {
-
+	//email withdraw refund amount successful
 	return nil
 }

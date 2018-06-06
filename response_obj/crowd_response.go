@@ -9,6 +9,8 @@ import (
 
 type CrowdFundingResponse struct {
 	ID               int64                       `json:"id"`
+	Hid              int64                       `json:"hid"`
+	ChainId          int64                       `json:"chain_id"`
 	UserId           int64                       `json:"user_id"`
 	Name             string                      `json:"name"`
 	Description      string                      `json:"description"`
@@ -38,6 +40,8 @@ type CrowdFundingShakedResponse struct {
 func MakeCrowdFundingResponse(model models.CrowdFunding) CrowdFundingResponse {
 	result := CrowdFundingResponse{}
 	result.ID = model.ID
+	result.Hid = model.Hid
+	result.ChainId = model.ChainId
 	result.UserId = model.UserId
 	result.Name = model.Name
 	result.Description = model.Description

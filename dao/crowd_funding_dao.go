@@ -19,6 +19,15 @@ func (crowdFundingDao CrowdFundingDao) GetById(id int64) (models.CrowdFunding) {
 	return dto
 }
 
+func (crowdFundingDao CrowdFundingDao) GetByHId(hid int64) (models.CrowdFunding) {
+	dto := models.CrowdFunding{}
+	err := models.Database().Where("hid = ?", hid).Order("id desc").First(&dto).Error
+	if err != nil {
+		log.Print(err)
+	}
+	return dto
+}
+
 func (crowdFundingDao CrowdFundingDao) GetFullById(id int64) (models.CrowdFunding) {
 	dto := models.CrowdFunding{}
 	db := models.Database()

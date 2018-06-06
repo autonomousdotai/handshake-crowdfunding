@@ -64,7 +64,8 @@ func (etherHandler *EtherHandler) Process(bytes []byte) (error) {
 		log.Println("NewEthHandler.Process()", err)
 		return err
 	}
-	event := logData["event"]
+	event := logData["event"].(string)
+	fromAddress := logData["from_address"].(string)
 	data, ok := logData["data"].(map[string]interface{})
 	if !ok {
 		return errors.New("data is missed")
@@ -123,14 +124,12 @@ func (etherHandler *EtherHandler) Process(bytes []byte) (error) {
 				return errors.New("balance is invalid")
 			}
 			if offchainType == utils.OFFCHAIN_CROWD_SHAKE {
-				offchainId, err := strconv.ParseInt(offchainIdStr, 10, 64)
+				crowdFundingShakeId, err := strconv.ParseInt(offchainIdStr, 10, 64)
 				if err != nil {
 					log.Println("NewEthHandler.Process()", err)
 					return err
 				}
-
-
-				err = crowdService.ProcessEventShake(hid, state, balance, offchainId)
+				err = crowdService.ProcessEventShake(hid, state, balance, crowdFundingShakeId, fromAddress)
 				if err != nil {
 					log.Println("NewEthHandler.Process()", err)
 					return err

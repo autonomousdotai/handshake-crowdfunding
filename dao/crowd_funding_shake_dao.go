@@ -10,7 +10,7 @@ import (
 type CrowdFundingShakeDao struct {
 }
 
-func (crowdFundingShakeDao CrowdFundingShakeDao) GetById(id int) (models.CrowdFundingShake) {
+func (crowdFundingShakeDao CrowdFundingShakeDao) GetById(id int64) (models.CrowdFundingShake) {
 	dto := models.CrowdFundingShake{}
 	err := models.Database().Where("id = ?", id).First(&dto).Error
 	if err != nil {
@@ -56,4 +56,23 @@ func (crowdFundingShakedDao CrowdFundingShakeDao) Delete(dto models.CrowdFunding
 		return dto, err
 	}
 	return dto, nil
+}
+
+func (crowdFundingShakeDao CrowdFundingShakeDao) GetAllByBackerStatus(crowdFundingId int64, userId int64, status int) ([]models.CrowdFundingShake) {
+	dtos := []models.CrowdFundingShake{}
+	db := models.Database()
+	if crowdFundingId > 0 {
+		db = db.Where("crowd_funding_id = ?", crowdFundingId)
+	}
+	if userId > 0 {
+		db = db.Where("user_id = ?", userId)
+	}
+	if status >= 0 {
+		db = db.Where("status = ?", status)
+	}
+	err := db.Find(&dtos).Error
+	if err != nil {
+		log.Print(err)
+	}
+	return dtos
 }
