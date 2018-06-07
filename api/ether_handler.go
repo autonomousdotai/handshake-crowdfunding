@@ -1,18 +1,19 @@
 package api
 
 import (
-	"cloud.google.com/go/pubsub"
 	"context"
-	"log"
 	"encoding/json"
 	"errors"
-	"github.com/ninjadotorg/handshake-crowdfunding/utils"
+	"log"
 	"strconv"
+
+	"cloud.google.com/go/pubsub"
+	"github.com/ninjadotorg/handshake-crowdfunding/utils"
 )
 
 type EtherHandler struct {
 	BubsubClient       *pubsub.Client
-	BubsubSubscription *pubsub.Subscription
+	PubsubSubscription *pubsub.Subscription
 }
 
 func NewEthHandler(pubsubClient *pubsub.Client, topicName, subscriptionName string) (*EtherHandler, error) {
@@ -21,7 +22,8 @@ func NewEthHandler(pubsubClient *pubsub.Client, topicName, subscriptionName stri
 	handler.BubsubClient = pubsubClient
 
 	topic := pubsubClient.Topic(topicName)
-	if topic == nil || topic.ID() != topicName {
+	existed, err := topic.Exists(context.Background())
+	if topic == nil || !existed {
 		var err error
 		topic, err = pubsubClient.CreateTopic(context.Background(), topicName)
 		if err != nil {
@@ -31,12 +33,12 @@ func NewEthHandler(pubsubClient *pubsub.Client, topicName, subscriptionName stri
 	}
 
 	sub := pubsubClient.Subscription(subscriptionName)
-	existed, err := sub.Exists(context.Background())
+	existed, err = sub.Exists(context.Background())
 	if err != nil {
 		log.Println("NewEthHandler", err)
 		return nil, err
 	}
-	if !existed {
+	if sub == nil || !existed {
 		var err error
 		sub, err = pubsubClient.CreateSubscription(context.Background(), subscriptionName, pubsub.SubscriptionConfig{Topic: topic})
 		if err != nil {
@@ -44,20 +46,26 @@ func NewEthHandler(pubsubClient *pubsub.Client, topicName, subscriptionName stri
 			return nil, err
 		}
 	}
-	err = sub.Receive(context.Background(), func(ctx context.Context, m *pubsub.Message) {
-		log.Printf("Got message : %s", m.Data)
-		m.Ack()
-		handler.Process(m.Data)
-	})
-	if err != nil {
-		log.Println("NewEthHandler", err)
-		return nil, err
-	}
+
+	handler.PubsubSubscription = sub
 
 	return &handler, nil
 }
 
-func (etherHandler *EtherHandler) Process(bytes []byte) (error) {
+func (etherHandler *EtherHandler) Receive() error {
+	err := etherHandler.PubsubSubscription.Receive(context.Background(), func(ctx context.Context, m *pubsub.Message) {
+		log.Printf("Got message : %s", m.Data)
+		m.Ack()
+		etherHandler.Process(m.Data)
+	})
+	if err != nil {
+		log.Println("NewEthHandler", err)
+		return err
+	}
+	return nil
+}
+
+func (etherHandler *EtherHandler) Process(bytes []byte) error {
 	logData := map[string]interface{}{}
 	err := json.Unmarshal(bytes, &logData)
 	if err != nil {

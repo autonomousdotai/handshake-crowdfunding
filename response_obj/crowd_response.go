@@ -2,9 +2,10 @@ package response_obj
 
 import (
 	"time"
+
+	"github.com/ninjadotorg/handshake-crowdfunding/bean"
 	"github.com/ninjadotorg/handshake-crowdfunding/models"
 	"github.com/ninjadotorg/handshake-crowdfunding/utils"
-	"github.com/ninjadotorg/handshake-crowdfunding/bean"
 )
 
 type CrowdFundingResponse struct {
@@ -123,6 +124,6 @@ func MakeArrayCrowdFundingFaqResponse(models []models.CrowdFundingFaq) []CrowdFu
 	return results
 }
 
-func MakePaginationCommentResponse(pagination *bean.Pagination) PaginationResponse {
+func MakePaginationCrowdFundingFaqResponse(pagination *bean.Pagination) PaginationResponse {
 	return MakePaginationResponse(pagination.Page, pagination.PageSize, pagination.Total, MakeArrayCrowdFundingFaqResponse(pagination.Items.([]models.CrowdFundingFaq)))
 }
