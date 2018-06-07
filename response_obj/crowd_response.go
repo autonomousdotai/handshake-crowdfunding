@@ -127,3 +127,44 @@ func MakeArrayCrowdFundingFaqResponse(models []models.CrowdFundingFaq) []CrowdFu
 func MakePaginationCrowdFundingFaqResponse(pagination *bean.Pagination) PaginationResponse {
 	return MakePaginationResponse(pagination.Page, pagination.PageSize, pagination.Total, MakeArrayCrowdFundingFaqResponse(pagination.Items.([]models.CrowdFundingFaq)))
 }
+
+type CrowdFundingPostResponse struct {
+	ID               int64        `json:"id"`
+	DateCreated      time.Time    `json:"date_created"`
+	DateModified     time.Time    `json:"date_modified"`
+	UserId           int64        `json:"user_id"`
+	CrowdFundingId   int64        `json:"crowd_funding_id"`
+	Title            string       `json:"title"`
+	ShortDescription string       `json:"short_description"`
+	Description      string       `json:"description"`
+	Status           int          `json:"status"`
+	User             UserResponse `json:"user"`
+}
+
+func MakeCrowdFundingPostResponse(model models.CrowdFundingPost) CrowdFundingPostResponse {
+	result := CrowdFundingPostResponse{}
+	result.ID = model.ID
+	result.DateCreated = model.DateCreated
+	result.DateModified = model.DateModified
+	result.UserId = model.UserId
+	result.CrowdFundingId = model.CrowdFundingId
+	result.Title = model.Title
+	result.ShortDescription = model.ShortDescription
+	result.Description = model.Description
+	result.Status = model.Status
+	result.User = MakeUserResponse(model.User)
+	return result
+}
+
+func MakeArrayCrowdFundingPostResponse(models []models.CrowdFundingPost) []CrowdFundingPostResponse {
+	results := []CrowdFundingPostResponse{}
+	for _, model := range models {
+		result := MakeCrowdFundingPostResponse(model)
+		results = append(results, result)
+	}
+	return results
+}
+
+func MakePaginationMakeArrayCrowdFundingPostResponse(pagination *bean.Pagination) PaginationResponse {
+	return MakePaginationResponse(pagination.Page, pagination.PageSize, pagination.Total, MakeArrayCrowdFundingPostResponse(pagination.Items.([]models.CrowdFundingPost)))
+}

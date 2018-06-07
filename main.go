@@ -58,6 +58,8 @@ func main() {
 	apiRouter.Init(router)
 	faqRouter := api.FaqApi{}
 	faqRouter.Init(router)
+	postRouter := api.PostApi{}
+	postRouter.Init(router)
 	router.Run(fmt.Sprintf(":%d", configs.AppConf.ServicePort))
 }
 

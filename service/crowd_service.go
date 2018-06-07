@@ -1,24 +1,25 @@
 package service
 
 import (
-	"github.com/ninjadotorg/handshake-crowdfunding/models"
-	"github.com/ninjadotorg/handshake-crowdfunding/bean"
-	"errors"
-	"mime/multipart"
-	"strings"
-	"time"
-	"github.com/ninjadotorg/handshake-crowdfunding/configs"
-	"log"
-	"github.com/ninjadotorg/handshake-crowdfunding/request_obj"
-	"github.com/ninjadotorg/handshake-crowdfunding/utils"
-	"github.com/gin-gonic/gin"
-	"strconv"
-	"fmt"
 	"bytes"
 	"encoding/json"
-	"net/http"
-	"github.com/rtt/Go-Solr"
+	"errors"
+	"fmt"
+	"log"
 	"math"
+	"mime/multipart"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/ninjadotorg/handshake-crowdfunding/bean"
+	"github.com/ninjadotorg/handshake-crowdfunding/configs"
+	"github.com/ninjadotorg/handshake-crowdfunding/models"
+	"github.com/ninjadotorg/handshake-crowdfunding/request_obj"
+	"github.com/ninjadotorg/handshake-crowdfunding/utils"
+	"github.com/rtt/Go-Solr"
 )
 
 type CrowdService struct {
@@ -152,7 +153,7 @@ func (crowdService CrowdService) UserShake(userId int64, crowdFundingId int64, q
 	return crowdFundingShake, nil
 }
 
-func (crowdService CrowdService) UnshakeCrowdFunding(userId int64, crowdFundingId int64) (error) {
+func (crowdService CrowdService) UnshakeCrowdFunding(userId int64, crowdFundingId int64) error {
 	crowdFunding := crowdFundingDao.GetFullByUser(userId, crowdFundingId)
 	if crowdFunding.ID <= 0 {
 		return errors.New("crowdFundingId is invalid")
@@ -173,7 +174,7 @@ func (crowdService CrowdService) UnshakeCrowdFunding(userId int64, crowdFundingI
 	return nil
 }
 
-func (crowdService CrowdService) CancelCrowdFunding(userId int64, crowdFundingId int64) (error) {
+func (crowdService CrowdService) CancelCrowdFunding(userId int64, crowdFundingId int64) error {
 	crowdFunding := crowdFundingDao.GetFullByUser(userId, crowdFundingId)
 	if crowdFunding.ID <= 0 {
 		return &bean.AppError{errors.New("crowdFundingId is invalid"), "crowdFundingId is invalid", -1, "error_occurred"}
@@ -194,7 +195,7 @@ func (crowdService CrowdService) CancelCrowdFunding(userId int64, crowdFundingId
 	return nil
 }
 
-func (crowdService CrowdService) RefundCrowdFunding(userId int64, crowdFundingId int64) (error) {
+func (crowdService CrowdService) RefundCrowdFunding(userId int64, crowdFundingId int64) error {
 	crowdFunding := crowdFundingDao.GetFullByUser(userId, crowdFundingId)
 	if crowdFunding.ID <= 0 {
 		return &bean.AppError{errors.New("crowdFundingId is invalid"), "crowdFundingId is invalid", -1, "error_occurred"}
@@ -216,7 +217,7 @@ func (crowdService CrowdService) RefundCrowdFunding(userId int64, crowdFundingId
 	return nil
 }
 
-func (crowdService CrowdService) IndexSolr(crowdFundingId int64) (error) {
+func (crowdService CrowdService) IndexSolr(crowdFundingId int64) error {
 	crowdFunding := crowdFundingDao.GetFullById(crowdFundingId)
 
 	crowdFundingImages := crowdFundingImageDao.GetByCrowdId(crowdFunding.ID)
@@ -226,7 +227,7 @@ func (crowdService CrowdService) IndexSolr(crowdFundingId int64) (error) {
 	}
 
 	document := map[string]interface{}{
-		"add": [] interface{}{
+		"add": []interface{}{
 			map[string]interface{}{
 				"id":                fmt.Sprintf("crowd_%d", crowdFunding.ID),
 				"hid_s":             "",
@@ -351,7 +352,7 @@ func (crowdService CrowdService) GetFaqsByCrowdId(crowdFundingId int64, paginati
 	return pagination, err
 }
 
-func (crowdService CrowdService) ProcessEventInit(hid int64, crowdFungdingId int64) (error) {
+func (crowdService CrowdService) ProcessEventInit(hid int64, crowdFungdingId int64) error {
 	crowdFunding := crowdFundingDao.GetById(crowdFungdingId)
 	if crowdFunding.ID <= 0 {
 		return errors.New("crowdFunding is invalid")
@@ -369,7 +370,7 @@ func (crowdService CrowdService) ProcessEventInit(hid int64, crowdFungdingId int
 	return nil
 }
 
-func (crowdService CrowdService) ProcessEventShake(hid int64, state int, balance float64, crowdFundingShakeId int64, fromAddress string) (error) {
+func (crowdService CrowdService) ProcessEventShake(hid int64, state int, balance float64, crowdFundingShakeId int64, fromAddress string) error {
 	crowdFundingShake := crowdFundingShakeDao.GetById(crowdFundingShakeId)
 	if crowdFundingShake.ID < 0 {
 		return errors.New("crowdFundingShake is invalid")
@@ -413,7 +414,7 @@ func (crowdService CrowdService) ProcessEventShake(hid int64, state int, balance
 	return nil
 }
 
-func (crowdService CrowdService) ProcessEventUnShake(hid int64, state int, balance float64, userId int64) (error) {
+func (crowdService CrowdService) ProcessEventUnShake(hid int64, state int, balance float64, userId int64) error {
 	tx := models.Database().Begin()
 
 	crowdFunding := crowdFundingDao.GetByHId(hid)
@@ -446,7 +447,7 @@ func (crowdService CrowdService) ProcessEventUnShake(hid int64, state int, balan
 	return nil
 }
 
-func (crowdService CrowdService) ProcessEventCancel(hid int64, state int, userId int64) (error) {
+func (crowdService CrowdService) ProcessEventCancel(hid int64, state int, userId int64) error {
 	tx := models.Database().Begin()
 
 	crowdFunding := crowdFundingDao.GetByHId(hid)
@@ -479,7 +480,7 @@ func (crowdService CrowdService) ProcessEventCancel(hid int64, state int, userId
 	return nil
 }
 
-func (crowdService CrowdService) ProcessEventRefund(hid int64, state int, userId int64) (error) {
+func (crowdService CrowdService) ProcessEventRefund(hid int64, state int, userId int64) error {
 	tx := models.Database().Begin()
 
 	crowdFunding := crowdFundingDao.GetByHId(hid)
@@ -502,7 +503,7 @@ func (crowdService CrowdService) ProcessEventRefund(hid int64, state int, userId
 	return nil
 }
 
-func (crowdService CrowdService) ProcessEventStop(hid int64, state int, crowdFungdingId int64) (error) {
+func (crowdService CrowdService) ProcessEventStop(hid int64, state int, crowdFungdingId int64) error {
 	crowdFunding := crowdFundingDao.GetById(crowdFungdingId)
 	if crowdFunding.ID <= 0 {
 		return errors.New("crowdFunding is invalid")
@@ -519,7 +520,59 @@ func (crowdService CrowdService) ProcessEventStop(hid int64, state int, crowdFun
 	return nil
 }
 
-func (crowdService CrowdService) ProcessEventWithdraw(hid int64, amount float64, userId int64) (error) {
+func (crowdService CrowdService) ProcessEventWithdraw(hid int64, amount float64, userId int64) error {
 	//email withdraw refund amount successful
 	return nil
+}
+
+func (crowdService CrowdService) CreatePost(userId int64, crowdFundingId int64, crowdFundingPostRequest request_obj.CrowdFundingPostRequest) (models.CrowdFundingPost, error) {
+	crowdFundingPost := models.CrowdFundingPost{}
+
+	crowdFundingPost.UserId = userId
+	crowdFundingPost.CrowdFundingId = crowdFundingId
+	crowdFundingPost.Title = crowdFundingPostRequest.Title
+	crowdFundingPost.ShortDescription = crowdFundingPostRequest.ShortDescription
+	crowdFundingPost.Description = crowdFundingPostRequest.Description
+	crowdFundingPost.Status = 1
+
+	crowdFundingPost, err := crowdFundingPostDao.Create(crowdFundingPost, nil)
+	if err != nil {
+		log.Println(err)
+		return crowdFundingPost, err
+	}
+
+	return crowdFundingPost, nil
+}
+
+func (crowdService CrowdService) UpdatePost(userId int64, updatedId int64, crowdFundingPostRequest request_obj.CrowdFundingPostRequest) (models.CrowdFundingPost, error) {
+	crowdFundingPost := crowdFundingPostDao.GetById(updatedId)
+
+	if crowdFundingPost.ID <= 0 || crowdFundingPost.UserId != userId {
+		return crowdFundingPost, errors.New("post_id is invalid")
+	}
+
+	crowdFundingPost.Title = crowdFundingPostRequest.Title
+	crowdFundingPost.ShortDescription = crowdFundingPostRequest.ShortDescription
+	crowdFundingPost.Description = crowdFundingPostRequest.Description
+
+	crowdFundingPost, err := crowdFundingPostDao.Update(crowdFundingPost, nil)
+	if err != nil {
+		log.Println(err)
+		return crowdFundingPost, err
+	}
+
+	return crowdFundingPost, nil
+}
+
+func (crowdService CrowdService) GetPostsByCrowdId(crowdFundingId int64, pagination *bean.Pagination) (*bean.Pagination, error) {
+	pagination, err := crowdFundingPostDao.GetAllBy(0, crowdFundingId, pagination)
+	faqs := pagination.Items.([]models.CrowdFundingPost)
+	items := []models.CrowdFundingPost{}
+	for _, faq := range faqs {
+		user, _ := crowdService.GetUser(faq.UserId)
+		faq.User = user
+		items = append(items, faq)
+	}
+	pagination.Items = items
+	return pagination, err
 }

@@ -21,7 +21,7 @@ type CrowdFundingFaqRequest struct {
 	Answer   string `json:"answer"`
 }
 
-type CrowdFundingUpdateRequest struct {
+type CrowdFundingPostRequest struct {
 	Title            string `json:"title"`
 	ShortDescription string `json:"short_description"`
 	Description      string `json:"description"`

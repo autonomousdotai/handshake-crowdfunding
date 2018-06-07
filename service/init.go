@@ -8,11 +8,11 @@ import (
 var (
 	fileUploadService = utils.GSService{}
 	// service
-	crowdFundingDao       = dao.CrowdFundingDao{}
-	crowdFundingImageDao  = dao.CrowdFundingImageDao{}
-	crowdFundingShakeDao  = dao.CrowdFundingShakeDao{}
-	crowdFundingFaqDao    = dao.CrowdFundingFaqDao{}
-	crowdFundingUpdateDao = dao.CrowdFundingUpdateDao{}
+	crowdFundingDao      = dao.CrowdFundingDao{}
+	crowdFundingImageDao = dao.CrowdFundingImageDao{}
+	crowdFundingShakeDao = dao.CrowdFundingShakeDao{}
+	crowdFundingFaqDao   = dao.CrowdFundingFaqDao{}
+	crowdFundingPostDao  = dao.CrowdFundingPostDao{}
 	// template
 	netUtil = utils.NetUtil{}
 )

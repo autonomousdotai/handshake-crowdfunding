@@ -23,6 +23,10 @@ func NewEthHandler(pubsubClient *pubsub.Client, topicName, subscriptionName stri
 
 	topic := pubsubClient.Topic(topicName)
 	existed, err := topic.Exists(context.Background())
+	if err != nil {
+		log.Println("NewEthHandler", err)
+		return nil, err
+	}
 	if topic == nil || !existed {
 		var err error
 		topic, err = pubsubClient.CreateTopic(context.Background(), topicName)
